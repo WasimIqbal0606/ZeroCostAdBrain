@@ -31,6 +31,158 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Mind-blowing gradient background styling
+st.markdown("""
+<style>
+/* Extraordinary animated gradient background */
+.stApp {
+    background: linear-gradient(-45deg, 
+        #ee7752, 
+        #e73c7e, 
+        #23a6d5, 
+        #23d5ab,
+        #ff6b6b,
+        #4ecdc4,
+        #45b7d1,
+        #f9ca24,
+        #f0932b,
+        #eb4d4b,
+        #6c5ce7,
+        #a29bfe
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 20s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Glassmorphism effect for main content */
+.main > div {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(12px) !important;
+    border-radius: 25px !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+}
+
+/* Enhanced containers with glass effect */
+div[data-testid="stVerticalBlock"] > div:has(> div.stMarkdown),
+div[data-testid="column"] > div {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Vibrant neon buttons */
+.stButton > button {
+    background: linear-gradient(90deg, 
+        #f093fb 0%, 
+        #f5576c 25%, 
+        #4facfe 50%, 
+        #00f2fe 75%, 
+        #43e97b 100%
+    ) !important;
+    background-size: 200% 100% !important;
+    color: white !important;
+    font-weight: bold !important;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.3) !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+    animation: buttonGradient 3s ease infinite !important;
+}
+
+@keyframes buttonGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.stButton > button:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 15px 40px rgba(245, 87, 108, 0.4) !important;
+}
+
+/* Glowing text effects */
+h1, h2, h3 {
+    background: linear-gradient(90deg, #fff, #f5576c, #4facfe, #fff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: textGlow 3s ease infinite;
+}
+
+@keyframes textGlow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+/* Sidebar with aurora effect */
+section[data-testid="stSidebar"] > div {
+    background: linear-gradient(180deg, 
+        rgba(102, 126, 234, 0.15) 0%, 
+        rgba(243, 104, 224, 0.15) 50%,
+        rgba(67, 233, 123, 0.15) 100%
+    );
+    backdrop-filter: blur(15px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Input fields with glow */
+.stTextInput > div > div > input,
+.stSelectbox > div > div > select,
+.stTextArea > div > div > textarea {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+/* Enhanced expander styling */
+.streamlit-expanderHeader {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 10px !important;
+}
+
+/* Tab styling */
+.stTabs [data-baseweb="tab-list"] {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 0.5rem;
+}
+
+/* Floating animation for cards */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Apply floating to metric cards */
+div[data-testid="metric-container"] {
+    animation: float 3s ease-in-out infinite;
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 15px !important;
+    padding: 1rem !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Initialize session state
 if 'vector_store' not in st.session_state:
     st.session_state.vector_store = QdrantVectorStore()
