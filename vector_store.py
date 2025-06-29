@@ -21,8 +21,19 @@ class QdrantVectorStore:
         self.client = None
         self.collection_name = "analogies"
         self.embedding_dim = 384  # Using sentence-transformers compatible size
+        self.db = None
         self._setup_qdrant()
         self._ensure_collection()
+        self._setup_database_integration()
+    
+    def _setup_database_integration(self):
+        """Setup PostgreSQL database integration."""
+        try:
+            from database import DatabaseManager
+            self.db = DatabaseManager()
+        except Exception as e:
+            logger.warning(f"Database integration not available: {e}")
+            self.db = None
     
     def _setup_qdrant(self):
         """Setup Qdrant client - try in-memory first, fallback to local file."""
@@ -88,6 +99,14 @@ class QdrantVectorStore:
         """Add an analogy to the vector store."""
         analogy_id = hashlib.md5(f"{trend}_{brand}_{analogy}".encode()).hexdigest()
         
+        # Store in database first
+        if self.db:
+            embedding = self._get_embedding(f"{trend} {brand} {analogy}")
+            db_id = self.db.save_analogy(trend, brand, analogy, embedding)
+            if db_id:
+                analogy_id = db_id
+        
+        # Store in Qdrant for vector search
         if not self.client:
             return analogy_id
         

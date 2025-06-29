@@ -10,15 +10,76 @@ import pandas as pd
 from datetime import datetime
 from typing import Dict, List, Any
 import streamlit as st
+from database import DatabaseManager
 
 class CampaignManager:
-    """Manages campaign data storage and retrieval."""
+    """Manages campaign data storage and retrieval with PostgreSQL."""
     
     def __init__(self):
+        self.db = DatabaseManager()
+        # Keep legacy file support as fallback
         self.campaigns_file = "campaigns.json"
-        self.campaigns = self.load_campaigns()
     
-    def load_campaigns(self) -> Dict:
+    def save_campaign(self, campaign_data: Dict) -> str:
+        """Save a new campaign to PostgreSQL database."""
+        # Add timestamp and ID if not present
+        if 'id' not in campaign_data:
+            campaign_data['id'] = f"campaign_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        if 'created_at' not in campaign_data:
+            campaign_data['created_at'] = datetime.now().isoformat()
+        
+        # Save to database
+        campaign_id = self.db.save_campaign(campaign_data)
+        
+        # Fallback to file if database fails
+        if not campaign_id:
+            return self._save_campaign_to_file(campaign_data)
+        
+        return campaign_id
+    
+    def get_campaign(self, campaign_id: str) -> Dict:
+        """Get a specific campaign from database."""
+        campaign = self.db.get_campaign(campaign_id)
+        if campaign:
+            return campaign
+        
+        # Fallback to file
+        return self._get_campaign_from_file(campaign_id)
+    
+    def list_campaigns(self) -> List[Dict]:
+        """List all campaigns from database."""
+        campaigns = self.db.list_campaigns()
+        if campaigns:
+            return campaigns
+        
+        # Fallback to file
+        return self._list_campaigns_from_file()
+    
+    def delete_campaign(self, campaign_id: str) -> bool:
+        """Delete a campaign from database."""
+        success = self.db.delete_campaign(campaign_id)
+        if success:
+            return True
+        
+        # Fallback to file
+        return self._delete_campaign_from_file(campaign_id)
+    
+    def _save_campaign_to_file(self, campaign_data: Dict) -> str:
+        """Fallback file storage."""
+        try:
+            campaigns = self._load_campaigns_from_file()
+            campaign_id = campaign_data['id']
+            campaigns[campaign_id] = campaign_data
+            
+            with open(self.campaigns_file, 'w') as f:
+                json.dump(campaigns, f, indent=2, default=str)
+            
+            return campaign_id
+        except Exception as e:
+            st.error(f"Error saving to file: {e}")
+            return ""
+    
+    def _load_campaigns_from_file(self) -> Dict:
         """Load campaigns from file."""
         try:
             if os.path.exists(self.campaigns_file):
@@ -28,39 +89,27 @@ class CampaignManager:
             st.error(f"Error loading campaigns: {e}")
         return {}
     
-    def save_campaigns(self):
-        """Save campaigns to file."""
+    def _get_campaign_from_file(self, campaign_id: str) -> Dict:
+        """Get campaign from file."""
+        campaigns = self._load_campaigns_from_file()
+        return campaigns.get(campaign_id, {})
+    
+    def _list_campaigns_from_file(self) -> List[Dict]:
+        """List campaigns from file."""
+        campaigns = self._load_campaigns_from_file()
+        return list(campaigns.values())
+    
+    def _delete_campaign_from_file(self, campaign_id: str) -> bool:
+        """Delete campaign from file."""
         try:
-            with open(self.campaigns_file, 'w') as f:
-                json.dump(self.campaigns, f, indent=2, default=str)
+            campaigns = self._load_campaigns_from_file()
+            if campaign_id in campaigns:
+                del campaigns[campaign_id]
+                with open(self.campaigns_file, 'w') as f:
+                    json.dump(campaigns, f, indent=2, default=str)
+                return True
         except Exception as e:
-            st.error(f"Error saving campaigns: {e}")
-    
-    def save_campaign(self, campaign_data: Dict) -> str:
-        """Save a new campaign."""
-        campaign_id = f"campaign_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        campaign_data['id'] = campaign_id
-        campaign_data['created_at'] = datetime.now().isoformat()
-        
-        self.campaigns[campaign_id] = campaign_data
-        self.save_campaigns()
-        
-        return campaign_id
-    
-    def get_campaign(self, campaign_id: str) -> Dict:
-        """Get a specific campaign."""
-        return self.campaigns.get(campaign_id, {})
-    
-    def list_campaigns(self) -> List[Dict]:
-        """List all campaigns."""
-        return list(self.campaigns.values())
-    
-    def delete_campaign(self, campaign_id: str) -> bool:
-        """Delete a campaign."""
-        if campaign_id in self.campaigns:
-            del self.campaigns[campaign_id]
-            self.save_campaigns()
-            return True
+            st.error(f"Error deleting from file: {e}")
         return False
 
 def export_campaign_to_csv(campaign_data: Dict) -> str:
