@@ -831,7 +831,7 @@ def display_cultural_intelligence(results):
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("**Cultural Momentum Metrics:**")
+        st.markdown("### Cultural Momentum Metrics")
         if cultural_data:
             social_engagement = cultural_data.get('social_engagement', 8.2)
             news_relevance = cultural_data.get('news_relevance', 7.8)
@@ -844,7 +844,7 @@ def display_cultural_intelligence(results):
             st.info("Cultural resonance data processing...")
     
     with col2:
-        st.markdown("**Optimal Timing Window:**")
+        st.markdown("### Optimal Timing Window")
         if timing_data:
             st.write(f"🎯 **Launch Window**: {timing_data.get('optimal_launch_window', 'Next 72 hours')}")
             st.write(f"📈 **Cultural Momentum**: {timing_data.get('cultural_momentum', 0.85):.1%}")
@@ -894,12 +894,12 @@ def display_neurosymbolic_insights(results):
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("**Narrative Framework:**")
+            st.markdown("### Narrative Framework")
             st.write(f"🎭 **Central Theme**: {framework.get('central_theme', 'Innovation meets culture')}")
             st.write(f"📖 **Story Arc**: {framework.get('story_arc', 'Transformation journey')}")
             
         with col2:
-            st.markdown("**Emotional Resonance:**")
+            st.markdown("### Emotional Resonance")
             st.write(f"❤️ **Primary Emotion**: {emotional_mapping.get('primary_emotion', 'Empowerment')}")
             st.write(f"📊 **Resonance Score**: {emotional_mapping.get('resonance_score', 8.9):.1f}/10")
 
@@ -925,7 +925,7 @@ def display_creative_assets(results):
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("**Viral-Optimized Headlines:**")
+            st.markdown("### Viral-Optimized Headlines")
             headlines = creative_data.get('headlines', ['Revolutionary campaign headline that captures attention'])
             for i, headline in enumerate(headlines[:3], 1):
                 st.markdown(f"""
@@ -941,7 +941,7 @@ def display_creative_assets(results):
                 """, unsafe_allow_html=True)
         
         with col2:
-            st.markdown("**Creative Copy Variants:**")
+            st.markdown("### Creative Copy Variants")
             copy_variants = creative_data.get('copy_variants', ['Compelling copy that resonates with cultural moment'])
             for variant in copy_variants[:2]:
                 st.markdown(f"""
@@ -955,7 +955,7 @@ def display_creative_assets(results):
                 </div>
                 """, unsafe_allow_html=True)
         
-        st.markdown("**Visual Concepts:**")
+        st.markdown("### Visual Concepts")
         visual_concepts = creative_data.get('visual_concepts', ['Dynamic brand visualization', 'Cultural moment capture'])
         for concept in visual_concepts:
             st.markdown(f"🎨 {concept}")
@@ -988,12 +988,12 @@ def display_autonomous_optimization(results):
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("**Channel Allocation:**")
+            st.markdown("### Channel Allocation")
             for channel, percentage in allocation.items():
                 st.progress(float(percentage) / 100, text=f"{channel.title()}: {percentage}%")
         
         with col2:
-            st.markdown("**Optimization Metrics:**")
+            st.markdown("### Optimization Metrics")
             st.write(f"📈 **Expected ROI**: {budget_data.get('expected_roi', 340)}% improvement")
             st.write(f"⚡ **Efficiency Score**: {budget_data.get('efficiency_score', 9.2):.1f}/10")
             st.write(f"🎯 **Attribution Confidence**: {budget_data.get('attribution_confidence', 89)}%")
