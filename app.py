@@ -12,7 +12,7 @@ import os
 
 # Import our custom modules
 from agents import TrendHarvester, AnalogicalReasoner, CreativeSynthesizer, BudgetOptimizer, PersonalizationAgent
-from vector_store import SimpleVectorStore
+from vector_store import QdrantVectorStore
 from utils import CampaignManager, export_campaign_to_csv, create_sample_user_profile, format_agent_response, create_budget_chart_data, validate_api_keys
 
 # Page configuration
@@ -25,7 +25,7 @@ st.set_page_config(
 
 # Initialize session state
 if 'vector_store' not in st.session_state:
-    st.session_state.vector_store = SimpleVectorStore()
+    st.session_state.vector_store = QdrantVectorStore()
 
 if 'campaign_manager' not in st.session_state:
     st.session_state.campaign_manager = CampaignManager()
@@ -63,13 +63,14 @@ def main():
     api_status = validate_api_keys()
     
     if not any(api_status.values()):
-        st.error("⚠️ No API keys found. Please set GEMINI_API_KEY and/or HUGGINGFACE_API_TOKEN environment variables.")
-        st.info("The app will use fallback responses for demonstration purposes.")
+        st.error("⚠️ No API keys found. Please configure API keys in settings.")
     else:
         if api_status["GEMINI_API_KEY"]:
-            st.success("✅ Gemini API key found")
+            st.success("✅ Gemini AI connected")
+        if api_status["MISTRAL_API_KEY"]:
+            st.success("✅ Mistral AI connected")
         if api_status["HUGGINGFACE_API_TOKEN"]:
-            st.success("✅ Hugging Face API key found")
+            st.success("✅ Hugging Face connected")
     
     # Initialize agents
     if not initialize_agents():
@@ -191,6 +192,25 @@ def run_campaign_workflow(topic, brand, user_profile, include_budget, include_pe
     # Display trend results
     with st.expander("📈 Trend Analysis Results", expanded=True):
         st.markdown(format_agent_response(trend_result['trends'], 'TrendHarvester'))
+        
+        # Show live data insights if available
+        if 'live_data' in trend_result and 'trend_signals' in trend_result:
+            st.subheader("🔴 Live Market Intelligence")
+            signals = trend_result['trend_signals']
+            
+            col1, col2, col3, col4 = st.columns(4)
+            with col1:
+                st.metric("Social Momentum", f"{signals['social_momentum']}/10")
+            with col2:
+                st.metric("News Coverage", f"{signals['news_relevance']}/10")
+            with col3:
+                st.metric("Tech Innovation", f"{signals['tech_innovation']}/10")
+            with col4:
+                st.metric("Market Interest", f"{signals['market_interest']}/10")
+            
+            # Show data sources
+            live_data = trend_result['live_data']['sources']
+            st.write(f"**Live Sources:** {len(live_data['reddit'])} Reddit posts, {len(live_data['news'])} news articles, {len(live_data['github'])} GitHub repos, {len(live_data['crypto'])} crypto trends")
     
     # Step 2: Analogical Reasoning
     status_text.text("🧠 Creating brand analogies...")

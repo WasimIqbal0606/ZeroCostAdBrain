@@ -192,5 +192,6 @@ def validate_api_keys() -> Dict[str, bool]:
     """Validate that required API keys are available."""
     return {
         "GEMINI_API_KEY": bool(os.getenv("GEMINI_API_KEY")),
+        "MISTRAL_API_KEY": bool(os.getenv("MISTRAL_API_KEY")),
         "HUGGINGFACE_API_TOKEN": bool(os.getenv("HUGGINGFACE_API_TOKEN"))
     }

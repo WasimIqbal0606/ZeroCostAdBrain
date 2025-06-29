@@ -32,10 +32,53 @@ class AIAgent:
         except Exception as e:
             logger.error(f"Error setting up Gemini client: {e}")
     
+    def call_mistral_api(self, prompt: str, model: str = "mistral-small-latest") -> str:
+        """Call La Plateforme Mistral API."""
+        try:
+            mistral_token = os.getenv("MISTRAL_API_KEY")
+            if not mistral_token:
+                return "Mistral API key not available"
+            
+            headers = {
+                "Authorization": f"Bearer {mistral_token}",
+                "Content-Type": "application/json"
+            }
+            
+            payload = {
+                "model": model,
+                "messages": [
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.7,
+                "max_tokens": 500
+            }
+            
+            response = requests.post(
+                "https://api.mistral.ai/v1/chat/completions",
+                headers=headers,
+                json=payload,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                if "choices" in result and len(result["choices"]) > 0:
+                    return result["choices"][0]["message"]["content"]
+                return str(result)
+            else:
+                logger.error(f"Mistral API error: {response.status_code} - {response.text}")
+                return f"API Error: {response.status_code}"
+                
+        except Exception as e:
+            logger.error(f"Error calling Mistral API: {e}")
+            return f"Error: {str(e)}"
+
     def call_huggingface_api(self, prompt: str, model: str = "mistralai/Mistral-7B-Instruct-v0.1") -> str:
         """Call Hugging Face Inference API."""
         try:
-            hf_token = os.getenv("HUGGINGFACE_API_TOKEN", "hf_placeholder")
+            hf_token = os.getenv("HUGGINGFACE_API_TOKEN")
+            if not hf_token:
+                return "HuggingFace API key not available"
             
             headers = {
                 "Authorization": f"Bearer {hf_token}",
@@ -93,22 +136,48 @@ class TrendHarvester(AIAgent):
     
     def __init__(self):
         super().__init__("TrendHarvester")
+        # Initialize live data fetcher
+        from live_data import LiveDataFetcher
+        self.live_data = LiveDataFetcher()
     
     def harvest_trends(self, query: str) -> Dict[str, Any]:
-        """Harvest trends for a given topic."""
+        """Harvest trends for a given topic with live data integration."""
         from prompts import TREND_PROMPT
         
-        prompt = TREND_PROMPT.format(query=query)
+        # Fetch live data first
+        live_trends = self.live_data.get_comprehensive_trends(query)
+        trend_signals = self.live_data.analyze_trend_signals(live_trends)
         
-        # Try Gemini first, fallback to HuggingFace
-        response = self.call_gemini_api(prompt)
-        if "Error:" in response:
-            response = self.call_huggingface_api(prompt)
+        # Enhance prompt with live data context
+        live_context = f"""
+        LIVE DATA CONTEXT:
+        - Social momentum score: {trend_signals['social_momentum']:.1f}/10
+        - News relevance: {trend_signals['news_relevance']}/10
+        - Tech innovation score: {trend_signals['tech_innovation']:.1f}/10
+        - Market interest: {trend_signals['market_interest']}/10
+        - Overall trend score: {trend_signals['overall_score']:.1f}/10
+        
+        Recent Reddit discussions: {len(live_trends['sources']['reddit'])} trending posts
+        Latest news coverage: {len(live_trends['sources']['news'])} articles
+        GitHub activity: {len(live_trends['sources']['github'])} trending repos
+        Crypto trends: {len(live_trends['sources']['crypto'])} trending coins
+        """
+        
+        enhanced_prompt = TREND_PROMPT.format(query=query) + live_context
+        
+        # Try Gemini first, then Mistral, fallback to HuggingFace
+        response = self.call_gemini_api(enhanced_prompt)
+        if "Error:" in response or "not available" in response:
+            response = self.call_mistral_api(enhanced_prompt)
+        if "Error:" in response or "not available" in response:
+            response = self.call_huggingface_api(enhanced_prompt)
         
         return {
             "agent": self.name,
             "query": query,
             "trends": response,
+            "live_data": live_trends,
+            "trend_signals": trend_signals,
             "status": "completed"
         }
 

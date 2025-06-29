@@ -23,9 +23,10 @@ This is a comprehensive advertising campaign creation and optimization platform 
   - PersonalizationAgent: Creates personalized user journeys
 
 ### Data Storage Solutions
-- **Vector Store**: In-memory vector storage using sentence transformers for similarity search
+- **Vector Store**: Qdrant in-memory vector database for production-grade similarity search
 - **Campaign Data**: JSON file-based storage for campaign persistence
-- **Embeddings**: SentenceTransformer model (all-MiniLM-L6-v2) for semantic similarity
+- **Embeddings**: Hugging Face API with sentence-transformers for semantic similarity
+- **Live Data Integration**: Real-time data from Reddit, GitHub, news APIs, and crypto trends
 
 ## Key Components
 
@@ -66,8 +67,9 @@ Each agent inherits from a base `AIAgent` class and specializes in specific camp
 
 ### AI Services
 - **Gemini AI**: Primary AI model for natural language processing
-- **Hugging Face**: Fallback inference API using Mistral-7B model
-- **SentenceTransformers**: Local embeddings for similarity search
+- **Mistral AI**: La Plateforme Mistral API for high-quality language model inference
+- **Hugging Face**: Inference API with multiple model support
+- **Qdrant**: Vector database for semantic similarity and analogical reasoning
 
 ### Python Libraries
 - **Streamlit**: Web application framework
@@ -78,7 +80,10 @@ Each agent inherits from a base `AIAgent` class and specializes in specific camp
 
 ### Environment Variables
 - `GEMINI_API_KEY`: Authentication for Google Gemini AI
+- `MISTRAL_API_KEY`: Authentication for La Plateforme Mistral AI
 - `HUGGINGFACE_API_TOKEN`: Authentication for Hugging Face API
+- `NEWS_API_KEY`: Optional for enhanced news data (NewsAPI)
+- `OPENWEATHER_API_KEY`: Optional for weather context data
 
 ## Deployment Strategy
 
@@ -101,7 +106,11 @@ Each agent inherits from a base `AIAgent` class and specializes in specific camp
 
 ```
 Changelog:
-- June 29, 2025. Initial setup
+- June 29, 2025. Initial setup with Streamlit and basic multi-agent architecture
+- June 29, 2025. Enhanced with Qdrant vector store for production-grade similarity search
+- June 29, 2025. Integrated La Plateforme Mistral AI API for improved language model capabilities
+- June 29, 2025. Added live data integration (Reddit, GitHub, news, crypto trends) for real-time market intelligence
+- June 29, 2025. Implemented comprehensive trend signal analysis with multi-source data fusion
 ```
 
 ## User Preferences
