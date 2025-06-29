@@ -82,11 +82,11 @@ def render_neural_network_background():
             xaxis=dict(showgrid=False, showticklabels=False, title=''),
             yaxis=dict(showgrid=False, showticklabels=False, title=''),
             zaxis=dict(showgrid=False, showticklabels=False, title=''),
-            bgcolor='rgba(255, 244, 230, 0.1)',
+            bgcolor='rgba(30, 30, 30, 0.1)',
             camera=dict(eye=dict(x=1.5, y=1.5, z=1.5))
         ),
-        paper_bgcolor='rgba(255, 244, 230, 0)',
-        plot_bgcolor='rgba(255, 244, 230, 0)',
+        paper_bgcolor='rgba(30, 30, 30, 0)',
+        plot_bgcolor='rgba(30, 30, 30, 0)',
         margin=dict(l=0, r=0, t=0, b=0),
         height=400,
         showlegend=False
@@ -99,14 +99,15 @@ def render_hero_section():
     
     st.markdown("""
     <div style="
-        background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+        background: linear-gradient(135deg, #2D2D2D 0%, #1E1E1E 100%);
         padding: 3rem 2rem;
         border-radius: 20px;
         margin-bottom: 2rem;
         box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        border: 1px solid rgba(255, 107, 53, 0.2);
     ">
         <h1 style="
-            color: white;
+            color: #FF6B35;
             font-size: 3.5rem;
             font-weight: 700;
             margin: 0;
@@ -145,18 +146,19 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
     
     st.markdown(f"""
     <div style="
-        background: white;
+        background: linear-gradient(135deg, #2D2D2D 0%, #1E1E1E 100%);
         border-radius: 16px;
         padding: 1.5rem;
         margin: 1rem 0;
         box-shadow: 0 4px 16px rgba(255, 107, 53, 0.1);
         border-left: 4px solid {color};
+        border: 1px solid rgba(255, 107, 53, 0.2);
         transition: all 0.3s ease;
     ">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <h3 style="
                 margin: 0;
-                color: #1F2937;
+                color: #FFFFFF;
                 font-size: 1.2rem;
                 font-weight: 600;
             ">{icon} {agent_name}</h3>
@@ -171,11 +173,11 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
         </div>
         <p style="
             margin: 0.5rem 0 0 0;
-            color: #6B7280;
+            color: #CCCCCC;
             font-size: 0.9rem;
             line-height: 1.4;
         ">{description}</p>
-        {f'<p style="margin: 0.5rem 0 0 0; color: #9CA3AF; font-size: 0.8rem;">⏱️ {execution_time:.1f}s</p>' if execution_time > 0 else ''}
+        {f'<p style="margin: 0.5rem 0 0 0; color: #999999; font-size: 0.8rem;">⏱️ {execution_time:.1f}s</p>' if execution_time > 0 else ''}
     </div>
     """, unsafe_allow_html=True)
 
@@ -277,12 +279,12 @@ def render_metric_card(label: str, value: float, icon: str):
     
     st.markdown(f"""
     <div style="
-        background: white;
+        background: linear-gradient(135deg, #2D2D2D 0%, #1E1E1E 100%);
         border-radius: 12px;
         padding: 1.5rem;
         text-align: center;
         box-shadow: 0 2px 8px rgba(255, 107, 53, 0.1);
-        border: 1px solid #FFE4CC;
+        border: 1px solid rgba(255, 107, 53, 0.2);
     ">
         <div style="font-size: 2rem; margin-bottom: 0.5rem;">{icon}</div>
         <div style="
@@ -293,7 +295,7 @@ def render_metric_card(label: str, value: float, icon: str):
         ">{value}/10</div>
         <div style="
             font-size: 0.9rem;
-            color: #6B7280;
+            color: #FFFFFF;
             font-weight: 500;
         ">{label}</div>
     </div>
@@ -304,12 +306,12 @@ def render_campaign_results_panel(results: Dict):
     
     st.markdown("""
     <div style="
-        background: white;
+        background: linear-gradient(135deg, #2D2D2D 0%, #1E1E1E 100%);
         border-radius: 16px;
         padding: 2rem;
         margin: 2rem 0;
         box-shadow: 0 8px 24px rgba(255, 107, 53, 0.1);
-        border: 1px solid #FFE4CC;
+        border: 1px solid rgba(255, 107, 53, 0.2);
     ">
     """, unsafe_allow_html=True)
     
@@ -391,7 +393,7 @@ def render_loading_animation():
         <div style="
             width: 50px;
             height: 50px;
-            border: 4px solid #FFE4CC;
+            border: 4px solid #2D2D2D;
             border-top: 4px solid #FF6B35;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -420,7 +422,7 @@ def render_status_indicator(status: str, message: str = ""):
     
     st.markdown(f"""
     <div style="
-        background: {config['bg']};
+        background: linear-gradient(135deg, #2D2D2D 0%, #1E1E1E 100%);
         border: 1px solid {config['color']};
         border-radius: 8px;
         padding: 1rem;
@@ -433,7 +435,7 @@ def render_status_indicator(status: str, message: str = ""):
             margin-right: 0.75rem;
         ">{config['icon']}</span>
         <span style="
-            color: {config['color']};
+            color: #FFFFFF;
             font-weight: 500;
         ">{message}</span>
     </div>
