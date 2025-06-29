@@ -8,7 +8,10 @@ import json
 import requests
 import logging
 from typing import Dict, List, Any
-from google import genai
+try:
+    from google import genai
+except ImportError:
+    genai = None
 from datetime import datetime
 
 
@@ -23,7 +26,7 @@ class BaseSpecializedAgent:
         """Setup AI model clients."""
         try:
             # Gemini client
-            if os.environ.get("GEMINI_API_KEY"):
+            if genai and os.environ.get("GEMINI_API_KEY"):
                 self.gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
             else:
                 self.gemini_client = None
