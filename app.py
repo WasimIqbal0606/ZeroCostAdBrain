@@ -562,7 +562,13 @@ def run_specialized_workflow(campaign_params, agents, data_manager):
         # Step 4: CopyCrafter - Generate headlines and video scripts
         print("✍️ CopyCrafter: Crafting headlines and video scripts...")
         story_hook = narrative_results.get('story_hook', 'Innovative solutions for modern challenges')
-        copy_results = agents['copy_crafter'].craft_copy(story_hook)
+        narrative_framework = narrative_results.get('narrative_framework', {
+            'hero': 'innovative professionals',
+            'challenge': 'modern business challenges',
+            'transformation': 'smart solutions',
+            'outcome': 'success and growth'
+        })
+        copy_results = agents['copy_crafter'].craft_copy(story_hook, narrative_framework)
         
         # Step 5: HookOptimizer - Rank by shareability and engagement
         print("📈 HookOptimizer: Optimizing for viral potential...")
