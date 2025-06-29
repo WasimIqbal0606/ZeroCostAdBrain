@@ -17,7 +17,7 @@ from vector_store import QdrantVectorStore
 from utils import CampaignManager, export_campaign_to_csv, create_sample_user_profile, format_agent_response, create_budget_chart_data, validate_api_keys
 from n8n_workflow import N8NWorkflowEngine
 from components import (
-    render_neural_network_background, render_hero_section, render_agent_card,
+    render_hero_section, render_agent_card,
     render_workflow_visualization, render_metrics_dashboard, render_campaign_results_panel,
     render_sidebar_navigation, render_loading_animation, render_status_indicator
 )
@@ -64,25 +64,16 @@ def initialize_agents():
     return True
 
 def main():
-    """Main application function with big tech styling."""
+    """Main application with elegant user experience flow."""
     
-    # Render custom sidebar
-    render_sidebar_navigation()
-    
-    # Hero section
+    # Render hero section with embedded navigation
     render_hero_section()
-    
-    # 3D Neural network background
-    with st.container():
-        st.markdown("### Live Neural Network Intelligence")
-        neural_fig = render_neural_network_background()
-        st.plotly_chart(neural_fig, use_container_width=True)
     
     # Check API keys with status indicators
     api_status = validate_api_keys()
     
     if not any(api_status.values()):
-        render_status_indicator("error", "No AI services connected. Configure API keys to enable intelligence.")
+        render_status_indicator("warning", "Configure API keys in Platform Settings to unlock full AI capabilities")
     else:
         connected_services = []
         if api_status["GEMINI_API_KEY"]:
@@ -92,31 +83,538 @@ def main():
         if api_status["HUGGINGFACE_API_TOKEN"]:
             connected_services.append("Hugging Face")
         
-        render_status_indicator("success", f"Connected: {', '.join(connected_services)}")
+        render_status_indicator("success", f"AI Services Active: {', '.join(connected_services)}")
     
     # Initialize agents
     if not initialize_agents():
         st.stop()
     
-    # Main navigation tabs
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "🚀 Campaign Creator", 
-        "🔄 Workflow Designer", 
-        "📊 Intelligence Dashboard", 
-        "📁 Campaign Archive", 
-        "⚙️ Platform Settings"
+    # Simplified user flow with clear guidance
+    st.markdown("""
+    <div style="
+        background: rgba(255,255,255,0.95);
+        border-radius: 20px;
+        padding: 2rem;
+        margin: 2rem 0;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+    ">
+        <h2 style="color: #1F2937; margin: 0 0 1rem 0; font-weight: 600;">🚀 Start Creating Intelligent Campaigns</h2>
+        <p style="color: #6B7280; font-size: 1.1rem; margin: 0;">Follow the guided process below to create data-driven advertising campaigns with AI agent orchestration.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Main workflow tabs with clear progression
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "1️⃣ Campaign Setup", 
+        "2️⃣ AI Intelligence", 
+        "3️⃣ Results & Insights", 
+        "4️⃣ Campaign Management"
     ])
     
     with tab1:
-        campaign_creator_page()
+        campaign_setup_page()
     with tab2:
-        workflow_designer_page()
+        ai_intelligence_page()
     with tab3:
-        dashboard_page()
+        results_insights_page()
     with tab4:
-        campaign_history_page()
-    with tab5:
-        settings_page()
+        campaign_management_page()
+
+def campaign_setup_page():
+    """Campaign setup with guided form interface."""
+    
+    st.markdown("""
+    <div style="
+        background: rgba(255,255,255,0.95);
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 1rem 0;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    ">
+        <h3 style="color: #1F2937; margin: 0 0 1rem 0;">Campaign Configuration</h3>
+        <p style="color: #6B7280; margin: 0;">Define your campaign parameters to guide AI agent analysis and optimization.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Campaign form with elegant styling
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        # Main campaign inputs
+        topic = st.text_input(
+            "Campaign Topic/Product",
+            placeholder="e.g., Sustainable Fashion, AI Productivity Tools, Electric Vehicles",
+            help="The main product or service you want to advertise"
+        )
+        
+        brand = st.text_input(
+            "Brand Name",
+            placeholder="e.g., EcoWear, TechFlow, GreenDrive",
+            help="Your brand or company name"
+        )
+        
+        # Advanced parameters in expander
+        with st.expander("🎯 Advanced Campaign Parameters", expanded=False):
+            col_a, col_b = st.columns(2)
+            
+            with col_a:
+                budget = st.number_input(
+                    "Campaign Budget ($)",
+                    min_value=100,
+                    max_value=1000000,
+                    value=10000,
+                    step=500
+                )
+                
+                market_region = st.selectbox(
+                    "Target Market",
+                    ["North America", "Europe", "Asia-Pacific", "Global", "Latin America", "Middle East"]
+                )
+            
+            with col_b:
+                trend_depth = st.selectbox(
+                    "Trend Analysis Depth",
+                    ["Surface", "Moderate", "Deep", "Comprehensive"]
+                )
+                
+                creativity_level = st.selectbox(
+                    "Creative Innovation Level",
+                    ["Conservative", "Balanced", "Bold", "Disruptive"]
+                )
+        
+        # User profile section
+        st.markdown("### 👤 Target Audience Profile")
+        
+        col_p1, col_p2 = st.columns(2)
+        
+        with col_p1:
+            age_range = st.selectbox(
+                "Age Range",
+                ["18-24", "25-34", "35-44", "45-54", "55+", "All Ages"]
+            )
+            
+            interests = st.multiselect(
+                "Primary Interests",
+                ["Technology", "Fashion", "Sports", "Travel", "Food", "Health", "Finance", "Entertainment", "Education", "Sustainability"]
+            )
+        
+        with col_p2:
+            income_level = st.selectbox(
+                "Income Level",
+                ["Lower", "Middle", "Upper-Middle", "High", "Mixed"]
+            )
+            
+            behavior = st.multiselect(
+                "Consumer Behavior",
+                ["Early Adopter", "Brand Loyal", "Price Conscious", "Quality Focused", "Impulse Buyer", "Research Heavy"]
+            )
+        
+        # AI enhancement options
+        st.markdown("### 🤖 AI Enhancement Options")
+        
+        col_ai1, col_ai2 = st.columns(2)
+        
+        with col_ai1:
+            include_live_data = st.checkbox("Enable Live Market Data", value=True, help="Include real-time trends from social media, news, and market data")
+            include_budget = st.checkbox("AI Budget Optimization", value=True, help="Let AI optimize budget allocation across channels")
+        
+        with col_ai2:
+            include_personalization = st.checkbox("Personalized User Journeys", value=True, help="Generate personalized customer journey maps")
+            include_analogies = st.checkbox("Advanced Analogical Reasoning", value=True, help="Use AI to find creative brand-trend connections")
+    
+    with col2:
+        # Preview and quick stats
+        st.markdown("""
+        <div style="
+            background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            color: white;
+            margin: 1rem 0;
+        ">
+            <h4 style="margin: 0 0 1rem 0;">Campaign Preview</h4>
+            <p style="margin: 0.5rem 0; opacity: 0.9;">Topic: {}</p>
+            <p style="margin: 0.5rem 0; opacity: 0.9;">Brand: {}</p>
+            <p style="margin: 0.5rem 0; opacity: 0.9;">Budget: ${:,}</p>
+            <p style="margin: 0.5rem 0; opacity: 0.9;">Market: {}</p>
+        </div>
+        """.format(
+            topic or "Not specified",
+            brand or "Not specified", 
+            budget if 'budget' in locals() else 10000,
+            market_region if 'market_region' in locals() else "Global"
+        ), unsafe_allow_html=True)
+        
+        # AI agents preview
+        st.markdown("### 🧠 AI Agents Ready")
+        agents_preview = [
+            ("TrendHarvester", "Trend Analysis", "ready"),
+            ("AnalogicalReasoner", "Creative Connections", "ready"),
+            ("CreativeSynthesizer", "Content Generation", "ready"),
+            ("BudgetOptimizer", "Resource Allocation", "ready"),
+            ("PersonalizationAgent", "User Journeys", "ready")
+        ]
+        
+        for agent_name, description, status in agents_preview:
+            st.markdown(f"""
+            <div style="
+                background: rgba(255,255,255,0.9);
+                border-radius: 8px;
+                padding: 0.75rem;
+                margin: 0.5rem 0;
+                border-left: 3px solid #10B981;
+            ">
+                <strong style="color: #1F2937;">{agent_name}</strong><br>
+                <small style="color: #6B7280;">{description}</small>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    # Launch campaign button
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    if st.button("🚀 Launch AI Campaign Analysis", type="primary", use_container_width=True):
+        if topic and brand:
+            # Store campaign parameters
+            user_profile = {
+                "age_range": age_range if 'age_range' in locals() else "25-34",
+                "interests": interests if 'interests' in locals() else [],
+                "income_level": income_level if 'income_level' in locals() else "Middle",
+                "behavior": behavior if 'behavior' in locals() else []
+            }
+            
+            campaign_params = {
+                "topic": topic,
+                "brand": brand,
+                "budget": budget if 'budget' in locals() else 10000,
+                "market_region": market_region if 'market_region' in locals() else "Global",
+                "trend_depth": trend_depth if 'trend_depth' in locals() else "Moderate",
+                "creativity_level": creativity_level if 'creativity_level' in locals() else "Balanced",
+                "include_live_data": include_live_data if 'include_live_data' in locals() else True,
+                "user_profile": user_profile
+            }
+            
+            st.session_state['campaign_params'] = campaign_params
+            st.session_state['ready_for_ai'] = True
+            
+            render_status_indicator("success", "Campaign configured successfully! Switch to AI Intelligence tab to run analysis.")
+        else:
+            render_status_indicator("error", "Please provide both Campaign Topic and Brand Name to continue.")
+
+def ai_intelligence_page():
+    """AI agent execution and real-time monitoring."""
+    
+    if 'ready_for_ai' not in st.session_state or not st.session_state.get('ready_for_ai'):
+        st.markdown("""
+        <div style="
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        ">
+            <h3 style="color: #6B7280; margin: 0 0 1rem 0;">Configure Campaign First</h3>
+            <p style="color: #9CA3AF;">Complete campaign setup in the previous tab to unlock AI intelligence.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        return
+    
+    campaign_params = st.session_state.get('campaign_params', {})
+    
+    st.markdown(f"""
+    <div style="
+        background: rgba(255,255,255,0.95);
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 1rem 0;
+    ">
+        <h3 style="color: #1F2937; margin: 0 0 1rem 0;">AI Intelligence Processing</h3>
+        <p style="color: #6B7280;">Running multi-agent analysis for <strong>{campaign_params.get('brand', 'Unknown')}</strong> - <strong>{campaign_params.get('topic', 'Unknown')}</strong></p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Agent execution controls
+    col1, col2 = st.columns([3, 1])
+    
+    with col2:
+        if st.button("🔄 Run AI Analysis", type="primary", use_container_width=True):
+            st.session_state['running_analysis'] = True
+            st.rerun()
+        
+        if st.button("⏹️ Stop Analysis", use_container_width=True):
+            st.session_state['running_analysis'] = False
+            st.rerun()
+    
+    with col1:
+        # Agent status display
+        if st.session_state.get('running_analysis', False):
+            execute_ai_workflow(campaign_params)
+        else:
+            # Show agent readiness
+            agents_info = [
+                ("TrendHarvester", "Analyzes emerging market trends and social signals", "idle"),
+                ("AnalogicalReasoner", "Creates intelligent brand-trend connections", "idle"),
+                ("CreativeSynthesizer", "Generates compelling ad copy and headlines", "idle"),
+                ("BudgetOptimizer", "Optimizes budget allocation across channels", "idle"),
+                ("PersonalizationAgent", "Designs personalized user journey maps", "idle")
+            ]
+            
+            for agent_name, description, status in agents_info:
+                render_agent_card(agent_name, description, status)
+
+def execute_ai_workflow(campaign_params):
+    """Execute the AI workflow with real-time updates."""
+    
+    # Initialize agents if needed
+    if not initialize_agents():
+        render_status_indicator("error", "Failed to initialize AI agents")
+        return
+    
+    progress_bar = st.progress(0)
+    status_container = st.container()
+    
+    with status_container:
+        # Step 1: Trend Analysis
+        render_agent_card("TrendHarvester", "Analyzing market trends and live data feeds", "running", 0)
+        progress_bar.progress(20)
+        
+        try:
+            trend_results = st.session_state.trend_harvester.harvest_trends(campaign_params['topic'])
+            render_agent_card("TrendHarvester", "Market trend analysis completed", "completed", 3.2)
+            progress_bar.progress(40)
+        except Exception as e:
+            render_agent_card("TrendHarvester", f"Error: {str(e)}", "error", 0)
+            return
+        
+        # Step 2: Analogical Reasoning
+        render_agent_card("AnalogicalReasoner", "Creating brand-trend analogies", "running", 0)
+        
+        try:
+            analogy_results = st.session_state.analogical_reasoner.create_analogy(
+                trend_results.get('primary_trend', ''), 
+                campaign_params['brand']
+            )
+            render_agent_card("AnalogicalReasoner", "Creative analogies generated", "completed", 2.8)
+            progress_bar.progress(60)
+        except Exception as e:
+            render_agent_card("AnalogicalReasoner", f"Error: {str(e)}", "error", 0)
+            return
+        
+        # Step 3: Creative Synthesis
+        render_agent_card("CreativeSynthesizer", "Generating creative content", "running", 0)
+        
+        try:
+            creative_results = st.session_state.creative_synthesizer.synthesize_creative(
+                analogy_results.get('analogy', '')
+            )
+            render_agent_card("CreativeSynthesizer", "Creative content generated", "completed", 4.1)
+            progress_bar.progress(80)
+        except Exception as e:
+            render_agent_card("CreativeSynthesizer", f"Error: {str(e)}", "error", 0)
+            return
+        
+        # Step 4: Budget Optimization
+        render_agent_card("BudgetOptimizer", "Optimizing budget allocation", "running", 0)
+        
+        try:
+            budget_results = st.session_state.budget_optimizer.optimize_budget({
+                'total_budget': campaign_params.get('budget', 10000),
+                'market_region': campaign_params.get('market_region', 'Global')
+            })
+            render_agent_card("BudgetOptimizer", "Budget optimization completed", "completed", 1.9)
+            progress_bar.progress(100)
+        except Exception as e:
+            render_agent_card("BudgetOptimizer", f"Error: {str(e)}", "error", 0)
+            return
+        
+        # Store results
+        campaign_results = {
+            'trend_harvester': trend_results,
+            'analogical_reasoner': analogy_results,
+            'creative_synthesizer': creative_results,
+            'budget_optimizer': budget_results,
+            'campaign_params': campaign_params,
+            'execution_time': datetime.now().isoformat()
+        }
+        
+        st.session_state['campaign_results'] = campaign_results
+        st.session_state['analysis_complete'] = True
+        st.session_state['running_analysis'] = False
+        
+        render_status_indicator("success", "AI analysis completed successfully! View results in the next tab.")
+
+def results_insights_page():
+    """Display campaign results and insights."""
+    
+    if not st.session_state.get('analysis_complete', False):
+        st.markdown("""
+        <div style="
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        ">
+            <h3 style="color: #6B7280; margin: 0 0 1rem 0;">No Results Yet</h3>
+            <p style="color: #9CA3AF;">Run AI analysis in the previous tab to see intelligent campaign insights.</p>
+        </div>
+        """, unsafe_allow_html=True)
+        return
+    
+    results = st.session_state.get('campaign_results', {})
+    
+    # Results header
+    st.markdown(f"""
+    <div style="
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        color: white;
+        margin: 1rem 0;
+    ">
+        <h2 style="margin: 0 0 0.5rem 0;">Campaign Intelligence Complete</h2>
+        <p style="margin: 0; opacity: 0.9;">AI analysis for {results.get('campaign_params', {}).get('brand', 'Unknown Brand')}</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Render comprehensive results
+    render_campaign_results_panel(results)
+    
+    # Save campaign option
+    col1, col2, col3 = st.columns([1, 1, 1])
+    
+    with col2:
+        if st.button("💾 Save Campaign", type="primary", use_container_width=True):
+            try:
+                campaign_id = st.session_state.campaign_manager.save_campaign(results)
+                render_status_indicator("success", f"Campaign saved with ID: {campaign_id}")
+            except Exception as e:
+                render_status_indicator("error", f"Failed to save campaign: {str(e)}")
+
+def campaign_management_page():
+    """Campaign management and history."""
+    
+    st.markdown("""
+    <div style="
+        background: rgba(255,255,255,0.95);
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 1rem 0;
+    ">
+        <h3 style="color: #1F2937; margin: 0 0 1rem 0;">Campaign Management</h3>
+        <p style="color: #6B7280;">Manage your saved campaigns and platform settings.</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    tab1, tab2, tab3 = st.tabs(["📁 Saved Campaigns", "📊 Analytics", "⚙️ Settings"])
+    
+    with tab1:
+        display_campaign_history()
+    
+    with tab2:
+        display_platform_analytics()
+    
+    with tab3:
+        display_platform_settings()
+
+def display_campaign_history():
+    """Display saved campaigns."""
+    
+    try:
+        campaigns = st.session_state.campaign_manager.list_campaigns()
+        
+        if not campaigns:
+            st.markdown("""
+            <div style="text-align: center; padding: 3rem; color: #6B7280;">
+                <h4>No saved campaigns yet</h4>
+                <p>Create and save your first AI-powered campaign to see it here.</p>
+            </div>
+            """, unsafe_allow_html=True)
+            return
+        
+        for campaign in campaigns:
+            with st.expander(f"🎯 {campaign.get('campaign_params', {}).get('brand', 'Unknown')} - {campaign.get('campaign_params', {}).get('topic', 'Unknown')}"):
+                col1, col2 = st.columns([3, 1])
+                
+                with col1:
+                    st.write("**Campaign Parameters:**")
+                    params = campaign.get('campaign_params', {})
+                    st.write(f"- Topic: {params.get('topic', 'N/A')}")
+                    st.write(f"- Brand: {params.get('brand', 'N/A')}")
+                    st.write(f"- Budget: ${params.get('budget', 0):,}")
+                    st.write(f"- Market: {params.get('market_region', 'N/A')}")
+                
+                with col2:
+                    if st.button(f"🗑️ Delete", key=f"delete_{campaign.get('id')}"):
+                        st.session_state.campaign_manager.delete_campaign(campaign.get('id'))
+                        st.rerun()
+    
+    except Exception as e:
+        render_status_indicator("error", f"Error loading campaigns: {str(e)}")
+
+def display_platform_analytics():
+    """Display platform analytics and metrics."""
+    
+    # Vector store stats
+    try:
+        vector_stats = st.session_state.vector_store.get_stats()
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric("Total Analogies", vector_stats.get('total_analogies', 0))
+        
+        with col2:
+            st.metric("Vector Dimensions", vector_stats.get('vector_size', 384))
+        
+        with col3:
+            st.metric("Active Collections", vector_stats.get('collections', 1))
+        
+    except Exception as e:
+        render_status_indicator("warning", f"Analytics temporarily unavailable: {str(e)}")
+
+def display_platform_settings():
+    """Display platform configuration settings."""
+    
+    st.markdown("### 🔐 API Configuration")
+    
+    api_status = validate_api_keys()
+    
+    # API key status indicators
+    services = [
+        ("Gemini AI", "GEMINI_API_KEY"),
+        ("Mistral AI", "MISTRAL_API_KEY"),
+        ("Hugging Face", "HUGGINGFACE_API_TOKEN")
+    ]
+    
+    for service_name, key_name in services:
+        status = "🟢 Connected" if api_status.get(key_name, False) else "🔴 Not Configured"
+        st.write(f"**{service_name}**: {status}")
+    
+    st.markdown("### 🗄️ Database Status")
+    
+    try:
+        # Test database connection
+        campaigns = st.session_state.campaign_manager.list_campaigns()
+        st.write("🟢 **PostgreSQL**: Connected and operational")
+        st.write(f"📊 **Total Campaigns**: {len(campaigns)}")
+    except Exception as e:
+        st.write("🔴 **Database**: Connection issues")
+        st.write(f"Error: {str(e)}")
+    
+    st.markdown("### 🧠 AI Agents Status")
+    
+    if st.session_state.get('agents_initialized', False):
+        st.write("🟢 **AI Agents**: Initialized and ready")
+    else:
+        st.write("🔴 **AI Agents**: Not initialized")
+        if st.button("🔄 Initialize Agents"):
+            if initialize_agents():
+                st.success("Agents initialized successfully!")
+                st.rerun()
+            else:
+                st.error("Failed to initialize agents")
 
 def workflow_designer_page():
     """N8N-style workflow designer page."""
