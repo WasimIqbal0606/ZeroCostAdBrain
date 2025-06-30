@@ -31,6 +31,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Add proper HTML5 DOCTYPE for standards compliance
+st.markdown("""
+    <script>
+        if (document.doctype === null) {
+            var doctype = document.implementation.createDocumentType('html', '', '');
+            document.insertBefore(doctype, document.documentElement);
+        }
+    </script>
+    """, unsafe_allow_html=True)
+
 # Mind-blowing gradient background styling
 st.markdown("""
 <style>
@@ -1408,13 +1418,15 @@ def campaign_creator_page():
             topic = st.text_input(
                 "Campaign Topic",
                 placeholder="AI-Powered Fitness, Sustainable Fashion, FinTech Innovation",
-                help="Define your campaign's core theme or industry focus"
+                help="Define your campaign's core theme or industry focus",
+                key="main_campaign_topic"
             )
             
             brand = st.text_input(
                 "Brand Identity",
                 placeholder="Nike, Tesla, Spotify, Local Startup",
-                help="Enter the brand name for campaign personalization"
+                help="Enter the brand name for campaign personalization",
+                key="main_brand_identity"
             )
             
             campaign_budget = st.number_input(

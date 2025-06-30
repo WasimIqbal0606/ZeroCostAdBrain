@@ -13,7 +13,7 @@ import json
 
 def render_hero_section():
     """Render next-level cyberpunk advertising neural brain hero section."""
-    
+
     # Advanced cyberpunk CSS for the hero section
     st.markdown("""
     <style>
@@ -96,15 +96,32 @@ def render_hero_section():
         0% { opacity: 0.6; transform: scale(1); }
         100% { opacity: 1; transform: scale(1.02); }
     }
+    /* Input fields with glow */
+    .stTextInput > div > div > input,
+    .stSelectbox > div > div > select,
+    .stTextArea > div > div > textarea {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: white !important;
+        backdrop-filter: blur(10px) !important;
+    }
+
+    /* Ensure proper form labeling */
+    .stTextInput > label,
+    .stSelectbox > label,
+    .stTextArea > label {
+        color: white !important;
+        font-weight: 600 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
-    
+
     # Create advertising neural network visualization
     fig = create_advertising_neural_network()
-    
+
     # Hero section layout
     col1, col2 = st.columns([3, 2])
-    
+
     with col1:
         st.markdown("""
         <div class="cyber-hero-container">
@@ -113,20 +130,20 @@ def render_hero_section():
             <div class="cyber-button">Activate Neural Matrix →</div>
         </div>
         """, unsafe_allow_html=True)
-    
+
     with col2:
         st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
 def create_advertising_neural_network():
     """Create cyberpunk advertising neural network visualization."""
-    
+
     # Generate advertising-specific network structure
     nodes_x, nodes_y, nodes_z = [], [], []
     edges_x, edges_y, edges_z = [], [], []
     node_colors = []
     node_sizes = []
     node_names = []
-    
+
     # Define advertising brain components
     ad_components = [
         {"name": "MemeHarvester", "color": "#FF006E", "size": 25, "pos": (0, 0, 1)},
@@ -136,7 +153,7 @@ def create_advertising_neural_network():
         {"name": "SequencePlanner", "color": "#8B5CF6", "size": 16, "pos": (-0.4, 0.7, 0)},
         {"name": "AnalyticsInterpreter", "color": "#F59E0B", "size": 15, "pos": (0, -0.8, 0)},
     ]
-    
+
     # Add social data sources (input layer)
     social_sources = [
         {"name": "Twitter", "color": "#1DA1F2", "size": 12, "pos": (1.2, 0.4, -0.5)},
@@ -144,7 +161,7 @@ def create_advertising_neural_network():
         {"name": "News", "color": "#4B5563", "size": 10, "pos": (0, 1.2, -0.5)},
         {"name": "Trends", "color": "#06B6D4", "size": 10, "pos": (-1.2, 0, -0.5)},
     ]
-    
+
     # Add output channels
     output_channels = [
         {"name": "Facebook", "color": "#1877F2", "size": 14, "pos": (0.8, -1, 0.8)},
@@ -152,9 +169,9 @@ def create_advertising_neural_network():
         {"name": "LinkedIn", "color": "#0A66C2", "size": 12, "pos": (0, -1.4, 0.4)},
         {"name": "Email", "color": "#34D399", "size": 10, "pos": (1.4, -0.6, 0.2)},
     ]
-    
+
     all_nodes = ad_components + social_sources + output_channels
-    
+
     # Create nodes
     for node in all_nodes:
         x, y, z = node["pos"]
@@ -164,7 +181,7 @@ def create_advertising_neural_network():
         node_colors.append(node["color"])
         node_sizes.append(node["size"])
         node_names.append(node["name"])
-    
+
     # Create connections (neural pathways)
     connections = [
         # Social sources to processing agents
@@ -178,12 +195,12 @@ def create_advertising_neural_network():
         (3, 10), (4, 11), (5, 12), (2, 13),  # To outputs
         (0, 10), (1, 11),  # Direct connections
     ]
-    
+
     for start, end in connections:
         edges_x.extend([nodes_x[start], nodes_x[end], None])
         edges_y.extend([nodes_y[start], nodes_y[end], None])
         edges_z.extend([nodes_z[start], nodes_z[end], None])
-    
+
     # Create 3D scatter plot for nodes
     node_trace = go.Scatter3d(
         x=nodes_x, y=nodes_y, z=nodes_z,
@@ -202,7 +219,7 @@ def create_advertising_neural_network():
                       '<extra></extra>',
         name="Neural Nodes"
     )
-    
+
     # Create 3D line plot for edges (neural pathways)
     edge_trace = go.Scatter3d(
         x=edges_x, y=edges_y, z=edges_z,
@@ -211,10 +228,10 @@ def create_advertising_neural_network():
         hoverinfo='none',
         name="Neural Pathways"
     )
-    
+
     # Create the figure
     fig = go.Figure(data=[edge_trace, node_trace])
-    
+
     # Update layout for cyberpunk aesthetic
     fig.update_layout(
         title="",
@@ -234,12 +251,12 @@ def create_advertising_neural_network():
         height=400,
         font=dict(color="white")
     )
-    
+
     return fig
 
 def render_agent_card(agent_name: str, description: str, status: str, execution_time: float = 0):
     """Render next-level cyberpunk agent status card."""
-    
+
     # Cyberpunk status colors and icons
     status_config = {
         'waiting': {'color': '#415A77', 'icon': '◯', 'bg': 'rgba(65, 90, 119, 0.15)', 'glow': 'rgba(65, 90, 119, 0.4)'},
@@ -247,9 +264,9 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
         'completed': {'color': '#00F5FF', 'icon': '●', 'bg': 'rgba(0, 245, 255, 0.15)', 'glow': 'rgba(0, 245, 255, 0.6)'},
         'error': {'color': '#FB5607', 'icon': '⚡', 'bg': 'rgba(251, 86, 7, 0.15)', 'glow': 'rgba(251, 86, 7, 0.6)'}
     }
-    
+
     config = status_config.get(status, status_config['waiting'])
-    
+
     st.markdown(f"""
     <div style="
         background: linear-gradient(135deg, rgba(13, 27, 42, 0.8), {config['bg']});
@@ -276,7 +293,7 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
             opacity: 0.1;
             animation: pulse 2s ease-in-out infinite alternate;
         "></div>
-        
+
         <div style="display: flex; align-items: center; gap: 1.5rem; position: relative; z-index: 2;">
             <div style="
                 font-size: 2rem;
@@ -311,9 +328,9 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
             </div>
         </div>
     </div>
-    
+
     <style>
-        @keyframes pulse {{
+        @keyframes pulse {
             0% {{ opacity: 0.1; transform: scale(1); }}
             100% {{ opacity: 0.3; transform: scale(1.05); }}
         }}
@@ -322,9 +339,9 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
 
 def render_metrics_dashboard(metrics: Dict):
     """Render cyberpunk metrics dashboard."""
-    
+
     col1, col2, col3, col4 = st.columns(4)
-    
+
     with col1:
         render_metric_card("Viral Potential", metrics.get('viral_score', 85), "🔥")
     with col2:
@@ -336,7 +353,7 @@ def render_metrics_dashboard(metrics: Dict):
 
 def render_metric_card(label: str, value: float, icon: str):
     """Render cyberpunk metric card."""
-    
+
     # Determine color based on value ranges
     if value >= 90:
         color = "#00F5FF"
@@ -347,7 +364,7 @@ def render_metric_card(label: str, value: float, icon: str):
     else:
         color = "#FB5607"
         glow = "rgba(251, 86, 7, 0.6)"
-    
+
     st.markdown(f"""
     <div style="
         background: linear-gradient(135deg, rgba(13, 27, 42, 0.9), rgba(27, 38, 59, 0.8));
@@ -374,7 +391,7 @@ def render_metric_card(label: str, value: float, icon: str):
             background: radial-gradient(circle at 50% 20%, {glow} 0%, transparent 60%);
             opacity: 0.15;
         "></div>
-        
+
         <div style="position: relative; z-index: 2;">
             <div style="
                 font-size: 3rem;
@@ -403,7 +420,7 @@ def render_metric_card(label: str, value: float, icon: str):
 
 def render_campaign_results_panel(results: Dict):
     """Render cyberpunk campaign results panel."""
-    
+
     st.markdown("""
     <div style="
         background: linear-gradient(135deg, rgba(13, 27, 42, 0.95), rgba(27, 38, 59, 0.9));
@@ -430,7 +447,7 @@ def render_campaign_results_panel(results: Dict):
                 radial-gradient(circle at 80% 20%, rgba(0, 245, 255, 0.1) 0%, transparent 50%);
             animation: resultsPulse 3s ease-in-out infinite alternate;
         "></div>
-        
+
         <div style="position: relative; z-index: 2;">
             <h3 style="
                 color: #00F5FF;
@@ -443,7 +460,7 @@ def render_campaign_results_panel(results: Dict):
             ">Neural Campaign Results</h3>
         </div>
     </div>
-    
+
     <style>
         @keyframes resultsPulse {
             0% { opacity: 0.8; transform: scale(1); }
@@ -454,7 +471,7 @@ def render_campaign_results_panel(results: Dict):
 
 def render_sidebar_navigation():
     """Render cyberpunk sidebar navigation."""
-    
+
     st.sidebar.markdown("""
     <style>
         .sidebar .sidebar-content {
@@ -469,7 +486,7 @@ def render_sidebar_navigation():
 
 def render_loading_animation():
     """Render cyberpunk loading animation."""
-    
+
     st.markdown("""
     <div style="
         display: flex;
@@ -490,7 +507,7 @@ def render_loading_animation():
             animation: cyberSpin 1s linear infinite;
         "></div>
     </div>
-    
+
     <style>
         @keyframes cyberSpin {
             0% { transform: rotate(0deg); }
@@ -501,16 +518,16 @@ def render_loading_animation():
 
 def render_status_indicator(status: str, message: str = ""):
     """Render cyberpunk status indicator."""
-    
+
     colors = {
         'success': '#00F5FF',
         'warning': '#FF006E', 
         'error': '#FB5607',
         'info': '#3B82F6'
     }
-    
+
     color = colors.get(status, '#00F5FF')
-    
+
     st.markdown(f"""
     <div style="
         background: linear-gradient(135deg, rgba(13, 27, 42, 0.9), rgba(27, 38, 59, 0.8));
@@ -532,7 +549,7 @@ def render_status_indicator(status: str, message: str = ""):
 
 def render_workflow_visualization(workflow_data: Dict):
     """Render cyberpunk workflow visualization."""
-    
+
     st.markdown("""
     <div style="
         background: linear-gradient(135deg, rgba(13, 27, 42, 0.9), rgba(27, 38, 59, 0.8));
@@ -556,3 +573,25 @@ def render_workflow_visualization(workflow_data: Dict):
         ">Neural Workflow Execution</h3>
     </div>
     """, unsafe_allow_html=True)
+
+# The following function was not in the original code, but it is needed based on the instructions.
+def render_campaign_form():
+    """Renders a form for creating a campaign."""
+    # Campaign form with elegant styling
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        # Main campaign inputs
+        topic = st.text_input(
+            "Campaign Topic/Product",
+            placeholder="e.g., Sustainable Fashion, AI Productivity Tools, Electric Vehicles",
+            help="The main product or service you want to advertise",
+            key="campaign_topic_input"
+        )
+
+        brand = st.text_input(
+            "Brand Name",
+            placeholder="e.g., EcoWear, TechFlow, GreenDrive",
+            help="Your brand or company name",
+            key="brand_name_input"
+        )
