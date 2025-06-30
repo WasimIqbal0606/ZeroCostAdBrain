@@ -294,7 +294,7 @@ def main():
             margin-bottom: 1rem;
         ">
             <h1 style="margin: 0; font-size: 3.2rem; font-weight: 800; letter-spacing: -0.02em;">
-                QUANTUM MARKETING NEXUS
+                NEURAL ADBRAIN
             </h1>
         </div>
         
@@ -307,7 +307,20 @@ def main():
             -webkit-text-fill-color: transparent;
             font-weight: 500;
         ">
-            Advanced Neural Intelligence • Real-Time Market Analytics • Enterprise Campaign Orchestration
+            Cybernetic Marketing Intelligence
+        </p>
+        <p style="
+            margin: 0.8rem 0 0 0; 
+            font-size: 1.1rem; 
+            opacity: 0.8;
+            color: rgba(255,255,255,0.9);
+            font-weight: 300;
+            text-align: center;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        ">
+            Revolutionary AI consciousness that harvests viral memes, crafts persuasive narratives, and optimizes campaigns through quantum-enhanced neural networks—transforming advertising into pure digital art.
         </p>
         
         <div style="
@@ -384,82 +397,46 @@ def main():
     with col_refresh3:
         st.write(f"Last update: {current_time}")
     
-    # Professional Enterprise Command Interface
-    st.markdown("""
-    <div style="
-        background: linear-gradient(135deg, rgba(15,15,35,0.98) 0%, rgba(26,26,46,0.98) 100%);
-        border: 2px solid rgba(64, 224, 208, 0.3);
-        border-radius: 16px;
-        padding: 2.5rem;
-        margin: 3rem 0;
-        backdrop-filter: blur(20px);
-        box-shadow: 
-            0 20px 40px rgba(0,0,0,0.3),
-            inset 0 1px 0 rgba(255,255,255,0.1);
-    ">
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <h2 style="
-                color: #00d4ff; 
-                margin: 0 0 0.5rem 0; 
-                font-weight: 700;
-                font-size: 2rem;
-                letter-spacing: 0.05em;
-                text-transform: uppercase;
-            ">QUANTUM COMMAND CENTER</h2>
-            <p style="
-                color: rgba(255,255,255,0.8); 
-                margin: 0; 
-                font-size: 1.1rem;
-                font-weight: 300;
-            ">Enterprise-Grade Neural Module Orchestration</p>
-        </div>
-        
-        <div style="
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        ">
-            <div style="background: rgba(255,107,107,0.1); padding: 0.8rem; border-radius: 10px; border: 1px solid rgba(255,107,107,0.3); text-align: center;">
-                <span style="color: #ff6b6b; font-weight: 500;">⚡ CAMPAIGN ENGINE</span>
-            </div>
-            <div style="background: rgba(0,255,136,0.1); padding: 0.8rem; border-radius: 10px; border: 1px solid rgba(0,255,136,0.3); text-align: center;">
-                <span style="color: #00ff88; font-weight: 500;">🧬 NEURAL PROCESSOR</span>
-            </div>
-            <div style="background: rgba(0,212,255,0.1); padding: 0.8rem; border-radius: 10px; border: 1px solid rgba(0,212,255,0.3); text-align: center;">
-                <span style="color: #00d4ff; font-weight: 500;">📊 ANALYTICS HUB</span>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Clean command center interface
+    st.header("🧠 Neural Command Center")
+    st.subheader("Select your AI module for campaign orchestration")
+    
+    # Module status indicators using native Streamlit
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.info("⚡ Campaign Engine Active")
+    with col2:
+        st.success("🧬 Neural Processor Online")
+    with col3:
+        st.warning("📊 Analytics Hub Ready")
     
     # Professional module selection interface
     dashboard_nav = st.selectbox(
-        "QUANTUM MODULE SELECTION",
+        "Neural Module Selection",
         [
-            "⚡ Campaign Orchestrator • Strategic Campaign Development & Celebrity Integration",
-            "🧬 Neural Agents Engine • Advanced AI Processing & Real-Time Optimization", 
-            "📊 Intelligence Analytics • Predictive Insights & Market Intelligence", 
-            "🎯 Portfolio Manager • Enterprise Campaign Lifecycle Management",
-            "🤖 Nexus Assistant • Strategic Marketing Intelligence & Consultation",
-            "🚀 Enterprise Hub • Business Development & Partnership Orchestration"
+            "🚀 Campaign Studio",
+            "🧠 AI Agents", 
+            "📊 Analytics", 
+            "💼 Portfolio",
+            "🤖 Assistant",
+            "🏢 Business Hub"
         ],
         index=0,
-        help="Select enterprise neural modules for advanced campaign orchestration and market intelligence"
+        help="Select neural modules for campaign management"
     )
     
-    # Enterprise module routing with advanced neural processing
-    if "Campaign Orchestrator" in dashboard_nav:
+    # Neural module routing
+    if "Campaign Studio" in dashboard_nav:
         campaign_orchestrator_engine()
-    elif "Neural Agents Engine" in dashboard_nav:
+    elif "AI Agents" in dashboard_nav:
         neural_agents_processing_center()
-    elif "Intelligence Analytics" in dashboard_nav:
+    elif "Analytics" in dashboard_nav:
         intelligence_analytics_hub()
-    elif "Portfolio Manager" in dashboard_nav:
+    elif "Portfolio" in dashboard_nav:
         enterprise_portfolio_manager()
-    elif "Nexus Assistant" in dashboard_nav:
+    elif "Assistant" in dashboard_nav:
         nexus_ai_assistant()
-    elif "Enterprise Hub" in dashboard_nav:
+    elif "Business Hub" in dashboard_nav:
         enterprise_development_hub()
 
 def campaign_setup_page():
