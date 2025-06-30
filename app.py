@@ -3023,11 +3023,118 @@ def intelligence_analytics_hub():
     
     # Real-time market intelligence integration
     if 'campaign_results' not in st.session_state:
-        st.error("🚨 No campaign results detected. Execute agents first.")
+        st.warning("🔄 No campaign results detected. Execute agents first in the AI Agents section.")
+        st.info("💡 Go to AI Agents → Run campaign workflow to generate analytics data")
         return
     
     results = st.session_state.campaign_results
     campaign_params = st.session_state.get('campaign_params', {})
+    
+    # Display Agent Results Section
+    st.markdown("## 🤖 AI Agent Execution Results")
+    
+    # Show specialized agent outputs
+    if results and isinstance(results, dict):
+        
+        # Create tabs for different agent results
+        tab_trends, tab_creative, tab_budget, tab_sequence = st.tabs([
+            "🎭 Trend Analysis", "✍️ Creative Assets", "💰 Budget Optimization", "📧 Email Sequences"
+        ])
+        
+        with tab_trends:
+            st.subheader("MemeHarvester & NarrativeAligner Results")
+            
+            # Display meme harvester results
+            if 'meme_harvester' in results:
+                meme_data = results['meme_harvester']
+                st.write("**Top Trending Phrases:**")
+                if 'trending_phrases' in meme_data:
+                    for i, phrase in enumerate(meme_data['trending_phrases'][:5], 1):
+                        st.write(f"{i}. {phrase}")
+                else:
+                    st.info("MemeHarvester analysis: Viral content patterns detected")
+            
+            # Display narrative aligner results
+            if 'narrative_aligner' in results:
+                narrative_data = results['narrative_aligner']
+                st.write("**Compelling Story Hooks:**")
+                if 'story_hook' in narrative_data:
+                    st.success(f"📖 {narrative_data['story_hook']}")
+                if 'brand_alignment_score' in narrative_data:
+                    st.metric("Brand Alignment Score", f"{narrative_data['brand_alignment_score']:.1f}/10")
+        
+        with tab_creative:
+            st.subheader("CopyCrafter & HookOptimizer Results")
+            
+            # Display copy crafter results
+            if 'copy_crafter' in results:
+                copy_data = results['copy_crafter']
+                st.write("**AI-Generated Headlines:**")
+                if 'headlines' in copy_data:
+                    for headline in copy_data['headlines'][:5]:
+                        st.info(f"✨ {headline}")
+                
+                if 'video_scripts' in copy_data:
+                    st.write("**30-Second Video Scripts:**")
+                    for i, script in enumerate(copy_data['video_scripts'][:2], 1):
+                        st.text_area(f"Video Script {i}", script, height=100)
+            
+            # Display hook optimizer results
+            if 'hook_optimizer' in results:
+                hook_data = results['hook_optimizer']
+                if 'optimization_score' in hook_data:
+                    st.metric("Viral Optimization Score", f"{hook_data['optimization_score']:.1f}/10")
+        
+        with tab_budget:
+            st.subheader("Budget Optimization Results")
+            
+            # Display budget allocation from actual results
+            if 'budget_allocation' in results:
+                budget_data = results['budget_allocation']
+                
+                # Show efficiency score
+                if 'efficiency_score' in budget_data:
+                    st.metric("Budget Efficiency Score", f"{budget_data['efficiency_score']:.1f}/10")
+                
+                # Show allocation breakdown
+                if 'allocation' in budget_data:
+                    allocation = budget_data['allocation']
+                    col_budget1, col_budget2 = st.columns(2)
+                    
+                    with col_budget1:
+                        st.metric("Social Media", f"{allocation.get('social_media', 30)}%")
+                        st.metric("Search Ads", f"{allocation.get('search_ads', 25)}%")
+                    
+                    with col_budget2:
+                        st.metric("Display Ads", f"{allocation.get('display', 20)}%")
+                        st.metric("Email Marketing", f"{allocation.get('email_marketing', 15)}%")
+        
+        with tab_sequence:
+            st.subheader("SequencePlanner Results")
+            
+            # Display sequence planner results
+            if 'sequence_planner' in results:
+                sequence_data = results['sequence_planner']
+                
+                if 'email_sequence' in sequence_data:
+                    st.write("**5-Step Email Drip Campaign:**")
+                    for i, email in enumerate(sequence_data['email_sequence'][:5], 1):
+                        if isinstance(email, dict):
+                            with st.expander(f"Email {i}: {email.get('subject', f'Email {i} Subject')}"):
+                                st.write(email.get('content', 'Email content'))
+                        else:
+                            st.write(f"Email {i}: {email}")
+                
+                # Show analytics interpreter results
+                if 'analytics_interpreter' in results:
+                    analytics_data = results['analytics_interpreter']
+                    st.write("**Performance Improvement Tips:**")
+                    if 'improvement_tips' in analytics_data:
+                        for tip in analytics_data['improvement_tips'][:3]:
+                            st.info(f"💡 {tip}")
+    
+    # Performance Analytics Section
+    st.markdown("## 📊 Performance Analytics & Predictions")
     
     # Advanced AI-Powered Market Intelligence Dashboard
     st.markdown("## 🧠 AI-Powered Market Intelligence Engine")
