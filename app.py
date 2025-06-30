@@ -2630,71 +2630,56 @@ def agency_partnerships_section():
             st.success("Workshop scheduled! Event coordination team will contact you within 24 hours.")
 
 def create_extraordinary_agent_card(name, description, status, execution_time=0.0):
-    """Create real-time agent cards with live status updates and streaming data."""
+    """Create agent cards using pure Streamlit components - no CSS."""
     
     current_time = datetime.now().strftime("%H:%M:%S")
     
-    status_colors = {
-        'running': {'bg': '#1e293b', 'border': '#f59e0b', 'text': '#f59e0b', 'badge': '#f59e0b', 'icon': '●'},
-        'completed': {'bg': '#064e3b', 'border': '#10b981', 'text': '#10b981', 'badge': '#10b981', 'icon': '✓'},
-        'processing': {'bg': '#1e3a8a', 'border': '#3b82f6', 'text': '#3b82f6', 'badge': '#3b82f6', 'icon': '⚡'}
+    # Status indicators
+    status_icons = {
+        'running': '🔄',
+        'completed': '✅', 
+        'processing': '⚡',
+        'ready': '⭕'
     }
     
-    config = status_colors.get(status, status_colors['running'])
+    status_colors = {
+        'running': 'orange',
+        'completed': 'green',
+        'processing': 'blue', 
+        'ready': 'gray'
+    }
     
-    st.markdown(f"""
-    <div style="
-        background: linear-gradient(135deg, {config['bg']} 0%, {config['bg']}cc 100%);
-        border: 2px solid {config['border']};
-        border-radius: 16px;
-        padding: 20px;
-        margin: 16px 0;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        position: relative;
-    ">
-        <div style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.1); padding: 0.2rem 0.5rem; border-radius: 8px; font-size: 0.7rem; color: white;">
-            {current_time}
-        </div>
-        <div style="display: flex; align-items: center; gap: 16px;">
-            <div style="
-                width: 48px;
-                height: 48px;
-                background: {config['badge']};
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 20px;
-                color: white;
-                font-weight: bold;
-                animation: {('pulse 1.5s infinite' if status == 'running' else 'none')};
-            ">{config['icon']}</div>
-            <div style="flex: 1;">
-                <h3 style="color: {config['text']}; margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">{name}</h3>
-                <p style="color: #e2e8f0; margin: 0 0 4px 0; font-size: 14px;">{description}</p>
-                {f'<p style="color: #a78bfa; margin: 0; font-size: 12px;">Completed in {execution_time:.1f}s • Live data processed</p>' if status == 'completed' else ''}
-                {f'<p style="color: #60a5fa; margin: 0; font-size: 12px;">Processing live data streams...</p>' if status == 'running' else ''}
-            </div>
-            <div style="
-                background: {config['badge']};
-                color: white;
-                padding: 6px 12px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: bold;
-                text-transform: uppercase;
-            ">{status}</div>
-        </div>
-    </div>
+    icon = status_icons.get(status, '⭕')
+    color = status_colors.get(status, 'gray')
     
-    <style>
-        @keyframes pulse {{
-            0% {{ opacity: 1; transform: scale(1); }}
-            50% {{ opacity: 0.7; transform: scale(1.05); }}
-            100% {{ opacity: 1; transform: scale(1); }}
-        }}
-    </style>
-    """, unsafe_allow_html=True)
+    # Use container with columns for layout
+    with st.container():
+        col1, col2, col3 = st.columns([1, 6, 2])
+        
+        with col1:
+            st.markdown(f"### {icon}")
+        
+        with col2:
+            st.subheader(name)
+            st.write(description)
+            if status == 'completed' and execution_time > 0:
+                st.caption(f"Completed in {execution_time:.1f}s • {current_time}")
+            elif status == 'running':
+                st.caption(f"Processing... • {current_time}")
+            else:
+                st.caption(f"Status: {status.title()} • {current_time}")
+        
+        with col3:
+            if status == 'running':
+                st.warning("RUNNING")
+            elif status == 'completed':
+                st.success("DONE")
+            elif status == 'processing':
+                st.info("PROCESSING")
+            else:
+                st.write("READY")
+        
+        st.divider()
 
 def campaign_dashboard():
     """Real-time campaign dashboard with live market data and demo campaigns."""
@@ -2928,25 +2913,14 @@ def campaign_dashboard():
                 st.error("Please provide both topic and brand name.")
 
 def ai_agents_studio():
-    """Real-time AI agents execution with live monitoring and streaming updates."""
+    """Real-time AI agents execution with live monitoring - pure Streamlit components."""
     
     current_time = datetime.now().strftime("%H:%M:%S")
-    st.markdown(f"""
-    <div style="
-        background: rgba(255,255,255,0.95);
-        border-radius: 16px;
-        padding: 2rem;
-        margin: 1rem 0;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        position: relative;
-    ">
-        <div style="position: absolute; top: 1rem; right: 1rem; background: #F59E0B; color: white; padding: 0.3rem 0.8rem; border-radius: 12px; font-size: 0.8rem;">
-            PROCESSING {current_time}
-        </div>
-        <h2 style="color: #1F2937; margin: 0 0 1rem 0;">Real-Time AI Agents Studio</h2>
-        <p style="color: #6B7280; margin: 0;">Live agent execution with streaming data processing and real-time optimization</p>
-    </div>
-    """, unsafe_allow_html=True)
+    
+    # Header using pure Streamlit
+    st.header("🤖 Real-Time AI Agents Studio")
+    st.subheader(f"Live agent execution with streaming data processing • {current_time}")
+    st.info("Watch your campaign being processed by 6 specialized AI agents in real-time")
     
     # Real-time agent status indicators
     col_status1, col_status2, col_status3 = st.columns(3)
@@ -3004,33 +2978,18 @@ def ai_agents_studio():
             st.session_state.campaign_results = create_fallback_results(campaign_params)
 
 def analytics_center():
-    """Real-time analytics center with live data streaming and dynamic metrics."""
+    """Real-time analytics center with live data streaming - pure Streamlit components."""
     
     current_time = datetime.now().strftime("%H:%M:%S")
-    st.markdown(f"""
-    <div style="
-        background: rgba(255,255,255,0.95);
-        border-radius: 16px;
-        padding: 2rem;
-        margin: 1rem 0;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        position: relative;
-    ">
-        <div style="position: absolute; top: 1rem; right: 1rem; background: #3B82F6; color: white; padding: 0.3rem 0.8rem; border-radius: 12px; font-size: 0.8rem;">
-            STREAMING {current_time}
-        </div>
-        <h2 style="color: #1F2937; margin: 0 0 1rem 0;">Real-Time Analytics Center</h2>
-        <p style="color: #6B7280; margin: 0;">Live performance metrics with streaming data feeds and dynamic insights</p>
-    </div>
-    """, unsafe_allow_html=True)
     
-    # Auto-refresh indicator
-    refresh_col1, refresh_col2 = st.columns([3, 1])
-    with refresh_col1:
-        st.info("Live data streaming enabled - metrics update automatically")
-    with refresh_col2:
-        if st.button("🔄 Refresh Now"):
-            st.rerun()
+    # Header using pure Streamlit
+    st.header("📈 Real-Time Analytics Center")
+    st.subheader(f"Live performance metrics with streaming data feeds • {current_time}")
+    st.success("Live data streaming enabled - metrics update automatically")
+    
+    # Refresh control
+    if st.button("🔄 Refresh Analytics Data"):
+        st.rerun()
     
     if 'campaign_results' not in st.session_state:
         st.warning("No campaign results available. Please execute agents first.")
