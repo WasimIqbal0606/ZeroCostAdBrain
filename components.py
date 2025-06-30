@@ -310,91 +310,147 @@ def create_advertising_neural_network():
     return fig
 
 def render_agent_card(agent_name: str, description: str, status: str, execution_time: float = 0):
-    """Render next-level cyberpunk agent status card."""
+    """Render professional React-style agent status card with better visibility."""
 
-    # Cyberpunk status colors and icons
+    # Professional status colors and icons with better contrast
     status_config = {
-        'waiting': {'color': '#415A77', 'icon': '◯', 'bg': 'rgba(65, 90, 119, 0.15)', 'glow': 'rgba(65, 90, 119, 0.4)'},
-        'running': {'color': '#FF006E', 'icon': '◐', 'bg': 'rgba(255, 0, 110, 0.15)', 'glow': 'rgba(255, 0, 110, 0.6)'},
-        'completed': {'color': '#00F5FF', 'icon': '●', 'bg': 'rgba(0, 245, 255, 0.15)', 'glow': 'rgba(0, 245, 255, 0.6)'},
-        'error': {'color': '#FB5607', 'icon': '⚡', 'bg': 'rgba(251, 86, 7, 0.15)', 'glow': 'rgba(251, 86, 7, 0.6)'},
-        'idle': {'color': '#6B7280', 'icon': '○', 'bg': 'rgba(107, 114, 128, 0.15)', 'glow': 'rgba(107, 114, 128, 0.4)'}
+        'waiting': {'color': '#6366F1', 'icon': '○', 'bg': 'rgba(99, 102, 241, 0.1)', 'border': '#6366F1'},
+        'running': {'color': '#F59E0B', 'icon': '●', 'bg': 'rgba(245, 158, 11, 0.1)', 'border': '#F59E0B'},
+        'completed': {'color': '#10B981', 'icon': '✓', 'bg': 'rgba(16, 185, 129, 0.1)', 'border': '#10B981'},
+        'error': {'color': '#EF4444', 'icon': '✗', 'bg': 'rgba(239, 68, 68, 0.1)', 'border': '#EF4444'},
+        'idle': {'color': '#6B7280', 'icon': '○', 'bg': 'rgba(107, 114, 128, 0.1)', 'border': '#6B7280'}
     }
 
     config = status_config.get(status, status_config['waiting'])
 
-    # Use a container to ensure proper rendering
-    container = st.container()
-    with container:
-        st.markdown(f"""
+    # Professional React-style component with JavaScript interactivity
+    component_id = f"agent-card-{hash(agent_name)}"
+    
+    html_content = f"""
+    <div id="{component_id}" class="agent-card" style="
+        background: rgba(255, 255, 255, 0.95);
+        border: 2px solid {config['border']};
+        border-radius: 12px;
+        padding: 20px;
+        margin: 16px 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    ">
+        <!-- Status indicator stripe -->
         <div style="
-            background: linear-gradient(135deg, rgba(13, 27, 42, 0.8), {config['bg']});
-            border: 1px solid {config['color']}80;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin: 0.8rem 0;
-            backdrop-filter: blur(20px);
-            box-shadow: 
-                0 8px 32px rgba(0,0,0,0.3),
-                0 0 0 1px {config['glow']},
-                inset 0 1px 0 rgba(255,255,255,0.1);
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: {config['color']};
+        "></div>
+        
+        <!-- Main content -->
+        <div style="
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-left: 8px;
         ">
+            <!-- Status icon -->
             <div style="
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: radial-gradient(circle at 50% 50%, {config['glow']} 0%, transparent 70%);
-                opacity: 0.1;
-                animation: pulse 2s ease-in-out infinite alternate;
-            "></div>
-
-            <div style="display: flex; align-items: center; gap: 1.5rem; position: relative; z-index: 2;">
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                background: {config['bg']};
+                border: 2px solid {config['color']};
+                font-size: 20px;
+                font-weight: bold;
+                color: {config['color']};
+            ">{config['icon']}</div>
+            
+            <!-- Agent info -->
+            <div style="flex: 1;">
                 <div style="
-                    font-size: 2rem;
-                    color: {config['color']};
-                    width: 50px;
-                    height: 50px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: linear-gradient(135deg, {config['bg']}, rgba(0,0,0,0.3));
-                    border-radius: 50%;
-                    border: 2px solid {config['color']};
-                    box-shadow: 0 0 20px {config['glow']};
-                    text-shadow: 0 0 10px {config['color']};
-                ">{config['icon']}</div>
-                <div style="flex: 1;">
-                    <div style="
-                        font-size: 1.3rem;
-                        font-weight: 700;
-                        color: {config['color']};
-                        margin-bottom: 0.5rem;
-                        text-shadow: 0 0 10px {config['glow']};
-                        letter-spacing: 0.5px;
-                    ">{agent_name}</div>
-                    <div style="
-                        font-size: 1rem;
-                        color: rgba(255,255,255,0.9);
-                        line-height: 1.5;
-                        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-                    ">{description}</div>
-                    {f'<div style="font-size: 0.9rem; color: {config["color"]}; margin-top: 0.5rem; font-weight: 600;">Neural processing: {execution_time:.1f}s</div>' if status == 'completed' else ''}
-                </div>
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #1F2937;
+                    margin-bottom: 4px;
+                    letter-spacing: -0.025em;
+                ">{agent_name}</div>
+                <div style="
+                    font-size: 14px;
+                    color: #6B7280;
+                    line-height: 1.5;
+                ">{description}</div>
+                {f'<div style="font-size: 12px; color: {config["color"]}; margin-top: 8px; font-weight: 500;">Completed in {execution_time:.1f}s</div>' if status == 'completed' else ''}
             </div>
+            
+            <!-- Status badge -->
+            <div style="
+                padding: 6px 12px;
+                border-radius: 20px;
+                background: {config['color']};
+                color: white;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            ">{status}</div>
         </div>
-
-        <style>
-            @keyframes pulse {{
-                0% {{ opacity: 0.1; transform: scale(1); }}
-                100% {{ opacity: 0.3; transform: scale(1.05); }}
+    </div>
+    
+    <script>
+        (function() {{
+            const card = document.getElementById('{component_id}');
+            if (card) {{
+                // Add hover effects
+                card.addEventListener('mouseenter', function() {{
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.15)';
+                }});
+                
+                card.addEventListener('mouseleave', function() {{
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+                }});
+                
+                // Add click animation
+                card.addEventListener('click', function() {{
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {{
+                        this.style.transform = 'translateY(-2px)';
+                    }}, 100);
+                }});
+                
+                // Add status-specific animations
+                if ('{status}' === 'running') {{
+                    const icon = card.querySelector('div:nth-child(2) > div:first-child');
+                    if (icon) {{
+                        icon.style.animation = 'pulse 2s infinite';
+                    }}
+                }}
             }}
-        </style>
-        """, unsafe_allow_html=True)
+        }})();
+    </script>
+    
+    <style>
+        @keyframes pulse {{
+            0%, 100% {{ opacity: 1; }}
+            50% {{ opacity: 0.5; }}
+        }}
+        
+        .agent-card:hover {{
+            border-color: {config['color']} !important;
+        }}
+    </style>
+    """
+    
+    st.markdown(html_content, unsafe_allow_html=True)
 
 def render_metrics_dashboard(metrics: Dict):
     """Render cyberpunk metrics dashboard."""
@@ -411,70 +467,118 @@ def render_metrics_dashboard(metrics: Dict):
         render_metric_card("ROI Prediction", metrics.get('roi_prediction', 156), "💎")
 
 def render_metric_card(label: str, value: float, icon: str):
-    """Render cyberpunk metric card."""
+    """Render professional React-style metric card with better visibility."""
 
-    # Determine color based on value ranges
+    # Professional color scheme based on value ranges
     if value >= 90:
-        color = "#00F5FF"
-        glow = "rgba(0, 245, 255, 0.6)"
+        color = "#10B981"  # Green
+        bg_color = "rgba(16, 185, 129, 0.1)"
     elif value >= 70:
-        color = "#FF006E"
-        glow = "rgba(255, 0, 110, 0.6)"
+        color = "#3B82F6"  # Blue
+        bg_color = "rgba(59, 130, 246, 0.1)"
+    elif value >= 50:
+        color = "#F59E0B"  # Amber
+        bg_color = "rgba(245, 158, 11, 0.1)"
     else:
-        color = "#FB5607"
-        glow = "rgba(251, 86, 7, 0.6)"
+        color = "#EF4444"  # Red
+        bg_color = "rgba(239, 68, 68, 0.1)"
 
+    card_id = f"metric-card-{hash(label)}"
+    
     st.markdown(f"""
-    <div style="
-        background: linear-gradient(135deg, rgba(13, 27, 42, 0.9), rgba(27, 38, 59, 0.8));
-        border: 2px solid {color}80;
-        border-radius: 20px;
-        padding: 2rem 1.5rem;
+    <div id="{card_id}" class="metric-card" style="
+        background: rgba(255, 255, 255, 0.95);
+        border: 2px solid {color};
+        border-radius: 16px;
+        padding: 24px;
         text-align: center;
-        backdrop-filter: blur(25px);
-        box-shadow: 
-            0 10px 40px rgba(0,0,0,0.4),
-            0 0 0 1px {glow},
-            inset 0 2px 0 rgba(255,255,255,0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
         position: relative;
         overflow: hidden;
-        transform: translateY(0);
-        transition: all 0.4s ease;
+        min-height: 140px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     ">
+        <!-- Background accent -->
         <div style="
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 50% 20%, {glow} 0%, transparent 60%);
-            opacity: 0.15;
+            height: 4px;
+            background: linear-gradient(90deg, {color}, {color}80);
         "></div>
-
-        <div style="position: relative; z-index: 2;">
-            <div style="
-                font-size: 3rem;
-                margin-bottom: 1rem;
-                text-shadow: 0 0 15px {color};
-            ">{icon}</div>
-            <div style="
-                font-size: 2.5rem;
-                font-weight: 900;
-                color: {color};
-                margin-bottom: 0.5rem;
-                text-shadow: 0 0 20px {glow};
-                letter-spacing: -1px;
-            ">{value}{'%' if value < 10 else ''}</div>
-            <div style="
-                font-size: 1rem;
-                color: rgba(255,255,255,0.8);
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        
+        <!-- Icon -->
+        <div style="
+            font-size: 32px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+        ">{icon}</div>
+        
+        <!-- Value -->
+        <div style="
+            font-size: 36px;
+            font-weight: 700;
+            color: {color};
+            margin-bottom: 8px;
+            line-height: 1;
+            letter-spacing: -0.025em;
+        ">{value:.1f}{'%' if value <= 100 else ''}</div>
+        
+        <!-- Label -->
+        <div style="
+            font-size: 14px;
+            color: #6B7280;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
             ">{label}</div>
-        </div>
+        
+        <!-- Progress indicator -->
+        <div style="
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: {min(value, 100)}%;
+            height: 3px;
+            background: {color};
+            transition: width 1.5s ease-out;
+        "></div>
     </div>
+    
+    <script>
+        (function() {{
+            const card = document.getElementById('{card_id}');
+            if (card) {{
+                // Add hover effects
+                card.addEventListener('mouseenter', function() {{
+                    this.style.transform = 'translateY(-4px) scale(1.02)';
+                    this.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15)';
+                    this.style.borderColor = '{color}';
+                }});
+                
+                card.addEventListener('mouseleave', function() {{
+                    this.style.transform = 'translateY(0) scale(1)';
+                    this.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+                }});
+                
+                // Add click animation
+                card.addEventListener('click', function() {{
+                    this.style.transform = 'translateY(-2px) scale(0.98)';
+                    setTimeout(() => {{
+                        this.style.transform = 'translateY(-4px) scale(1.02)';
+                    }}, 150);
+                }});
+            }}
+        }})();
+    </script>
     """, unsafe_allow_html=True)
 
 def render_campaign_results_panel(results: Dict):

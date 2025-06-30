@@ -1,0 +1,53 @@
+Based on the code you shared, here are the most common reasons CSS shows up as raw text instead of styling your page—and how to check each:
+
+1. Style block not wrapped in <style> tags or missing type attribute
+
+What to check: Ensure your CSS is enclosed between <style> and </style> (when embedded in HTML) and, if your document is XHTML, that you include type="text/css".
+
+Example:
+
+<head>
+  <style type="text/css">
+    /* your CSS here */
+  </style>
+</head>
+
+Symptom: If you omit <style> tags or place CSS outside them, browsers render it as plain text.
+
+2. CSS file not properly linked (wrong path or missing rel)
+
+What to check: In your <head>, confirm you have a <link> tag pointing to your stylesheet with the correct path and filename:
+
+<link rel="stylesheet" href="/static/css/style.css">
+
+Symptom: A typo in href or forgetting rel="stylesheet" causes the CSS file to be treated as content rather than applied styles.
+
+3. MIME type misconfiguration on server
+
+What to check: When your server serves .css files, it must send Content-Type: text/css headers. If it sends text/plain, the browser will display the CSS text instead of parsing it.
+
+How to test: Open DevTools → Network tab → reload page → click your CSS file → check the Response Headers.
+
+4. CSS output inside a <pre> or code container
+
+What to check: Make sure you’re not accidentally printing CSS within a <pre>, <code>, or other tag that forces literal text rendering.
+
+Symptom: The CSS appears styled like code blocks rather than affecting page styles.
+
+5. Streamlit-specific quirks (if using Streamlit)
+
+What to check: When using st.markdown(...) to inject CSS, you must pass unsafe_allow_html=True. Otherwise, Markdown will escape your <style> tags and show them as text.
+
+Example:
+
+st.markdown(
+  """
+  <style>
+    /* your CSS */
+  </style>
+  """,
+  unsafe_allow_html=True
+)
+
+Next steps: Please share your HTML <head> section (with your <link> and/or <style> tags) and the server console or DevTools Network/Console errors you’re seeing. With the exact <head> snippet and any error messages, I can pinpoint which of these issues is affecting your setup.
+
