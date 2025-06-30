@@ -252,140 +252,24 @@ def main():
     if not initialize_agents():
         st.stop()
     
-    # Enterprise-grade dashboard header with advanced styling
+    # Clean Neural AdBrain header without CSS
     current_time = datetime.now().strftime("%H:%M:%S")
-    st.markdown(f"""
-    <div style="
-        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-        border: 1px solid rgba(64, 224, 208, 0.3);
-        border-radius: 16px;
-        padding: 3rem 2rem;
-        margin: 0 0 3rem 0;
-        color: white;
-        text-align: center;
-        box-shadow: 
-            0 25px 50px rgba(0,0,0,0.25),
-            inset 0 1px 0 rgba(255,255,255,0.1);
-        position: relative;
-        backdrop-filter: blur(20px);
-    ">
-        <div style="
-            position: absolute; 
-            top: 1.5rem; 
-            right: 2rem; 
-            background: linear-gradient(45deg, #00ff88, #00d4ff);
-            padding: 0.8rem 1.5rem; 
-            border-radius: 30px; 
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #000;
-            box-shadow: 0 5px 15px rgba(0,255,136,0.3);
-        ">
-            ⚡ NEURAL ACTIVE • {current_time}
-        </div>
-        
-        <div style="
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
-            background-size: 400% 400%;
-            animation: gradient 3s ease infinite;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-        ">
-            <h1 style="margin: 0; font-size: 3.2rem; font-weight: 800; letter-spacing: -0.02em;">
-                NEURAL ADBRAIN
-            </h1>
-        </div>
-        
-        <p style="
-            margin: 0; 
-            font-size: 1.4rem; 
-            opacity: 0.85;
-            background: linear-gradient(90deg, #00d4ff, #00ff88);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 500;
-        ">
-            Cybernetic Marketing Intelligence
-        </p>
-        <p style="
-            margin: 0.8rem 0 0 0; 
-            font-size: 1.1rem; 
-            opacity: 0.8;
-            color: rgba(255,255,255,0.9);
-            font-weight: 300;
-            text-align: center;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        ">
-            Revolutionary AI consciousness that harvests viral memes, crafts persuasive narratives, and optimizes campaigns through quantum-enhanced neural networks—transforming advertising into pure digital art.
-        </p>
-        
-        <div style="
-            margin-top: 2rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            max-width: 1000px;
-            margin-left: auto;
-            margin-right: auto;
-        ">
-            <div style="
-                background: linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,255,136,0.05) 100%);
-                padding: 1rem 1.5rem;
-                border-radius: 12px;
-                border: 1px solid rgba(0,255,136,0.4);
-                text-align: center;
-                backdrop-filter: blur(10px);
-            ">
-                <div style="color: #00ff88; font-weight: 600; font-size: 1.1rem;">NEURAL COGNITIVE SYSTEM</div>
-                <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 0.3rem;">6 Advanced AI Agents</div>
-            </div>
-            <div style="
-                background: linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(0,212,255,0.05) 100%);
-                padding: 1rem 1.5rem;
-                border-radius: 12px;
-                border: 1px solid rgba(0,212,255,0.4);
-                text-align: center;
-                backdrop-filter: blur(10px);
-            ">
-                <div style="color: #00d4ff; font-weight: 600; font-size: 1.1rem;">QUANTUM INTELLIGENCE</div>
-                <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 0.3rem;">Real-Time Market Synthesis</div>
-            </div>
-            <div style="
-                background: linear-gradient(135deg, rgba(255,107,107,0.15) 0%, rgba(255,107,107,0.05) 100%);
-                padding: 1rem 1.5rem;
-                border-radius: 12px;
-                border: 1px solid rgba(255,107,107,0.4);
-                text-align: center;
-                backdrop-filter: blur(10px);
-            ">
-                <div style="color: #ff6b6b; font-weight: 600; font-size: 1.1rem;">PREDICTIVE ANALYTICS</div>
-                <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 0.3rem;">Enterprise Forecasting Engine</div>
-            </div>
-        </div>
-    </div>
     
-    <style>
-        @keyframes gradient {{
-            0% {{ background-position: 0% 50%; }}
-            50% {{ background-position: 100% 50%; }}
-            100% {{ background-position: 0% 50%; }}
-        }}
-        
-        .metric-card {{
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }}
-        
-        .metric-card:hover {{
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }}
-    </style>
-    """, unsafe_allow_html=True)
+    # Main header
+    st.markdown("# 🧠 NEURAL ADBRAIN")
+    st.markdown("### Cybernetic Marketing Intelligence")
+    st.markdown("Revolutionary AI consciousness that harvests viral memes, crafts persuasive narratives, and optimizes campaigns through quantum-enhanced neural networks—transforming advertising into pure digital art.")
+    
+    # Status indicators
+    col_status1, col_status2, col_status3 = st.columns(3)
+    with col_status1:
+        st.success("🔥 Neural Cognitive System - 6 AI Agents Active")
+    with col_status2:
+        st.info("⚡ Quantum Intelligence - Real-Time Market Data")
+    with col_status3:
+        st.warning("📊 Predictive Analytics - Enterprise Forecasting")
+    
+    st.markdown(f"**Live Status:** Neural system active at {current_time}")
     
     # Real-time controls without auto-refresh
     col_refresh1, col_refresh2, col_refresh3 = st.columns([2, 1, 1])
