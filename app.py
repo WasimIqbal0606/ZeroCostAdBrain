@@ -2703,7 +2703,7 @@ def create_extraordinary_agent_card(name, description, status, execution_time=0.
     """, unsafe_allow_html=True)
 
 def campaign_dashboard():
-    """Real-time campaign dashboard with live market data."""
+    """Real-time campaign dashboard with live market data and demo campaigns."""
     
     current_time = datetime.now().strftime("%H:%M:%S")
     st.markdown(f"""
@@ -2723,7 +2723,147 @@ def campaign_dashboard():
     </div>
     """, unsafe_allow_html=True)
     
+    # Promotional demo campaigns section
+    st.markdown("### 🎯 Featured Demo Campaigns")
+    
+    demo_campaigns = [
+        {
+            "title": "Celebrity Chef Restaurant Empire Launch",
+            "brand": "Gordon Ramsay's AI Kitchen",
+            "description": "Celebrity chef leveraging AI for personalized cooking experiences",
+            "budget": 150000,
+            "expected_roi": "485%",
+            "trend_focus": "Celebrity AI Innovation",
+            "celebrity_angle": "Gordon Ramsay partners with AI to create personalized cooking masterclasses"
+        },
+        {
+            "title": "Elon Musk Inspired Space Tourism Campaign",
+            "brand": "StarVoyage Pro",
+            "description": "Space tourism platform with celebrity endorsement strategy",
+            "budget": 500000,
+            "expected_roi": "720%",
+            "trend_focus": "Space Commerce Revolution",
+            "celebrity_angle": "Following Elon's vision - making space accessible to everyone"
+        },
+        {
+            "title": "Kardashian-Style Beauty Empire Disruption",
+            "brand": "GlowTech Beauty",
+            "description": "AI-powered beauty recommendations with influencer marketing",
+            "budget": 250000,
+            "expected_roi": "890%",
+            "trend_focus": "AI Beauty Personalization",
+            "celebrity_angle": "Celebrity-endorsed AI beauty consultant that knows your skin better than you do"
+        },
+        {
+            "title": "Tim Cook Business Leadership Academy",
+            "brand": "ExecutiveAI Mastery",
+            "description": "AI-powered business education inspired by tech leaders",
+            "budget": 300000,
+            "expected_roi": "650%",
+            "trend_focus": "AI Executive Training",
+            "celebrity_angle": "Learn from Tim Cook's strategies with AI-powered business coaching"
+        },
+        {
+            "title": "Oprah-Inspired Wellness Revolution",
+            "brand": "MindfulAI Wellness",
+            "description": "Celebrity wellness approach with AI-powered life coaching",
+            "budget": 200000,
+            "expected_roi": "540%",
+            "trend_focus": "AI Wellness Transformation",
+            "celebrity_angle": "Oprah's wisdom meets AI technology for personal transformation"
+        },
+        {
+            "title": "Dwayne Johnson Fitness Empire",
+            "brand": "RockSolid AI Training",
+            "description": "Celebrity athlete AI training programs for mass market",
+            "budget": 180000,
+            "expected_roi": "420%",
+            "trend_focus": "Celebrity AI Fitness",
+            "celebrity_angle": "Train like The Rock with AI-powered personalized workout programs"
+        }
+    ]
+    
+    for i, campaign in enumerate(demo_campaigns):
+        with st.expander(f"🌟 {campaign['title']} - Celebrity Campaign Demo"):
+            col_demo1, col_demo2 = st.columns([2, 1])
+            
+            with col_demo1:
+                st.markdown(f"**Brand:** {campaign['brand']}")
+                st.markdown(f"**Campaign Focus:** {campaign['description']}")
+                st.markdown(f"**Celebrity Strategy:** {campaign['celebrity_angle']}")
+                st.markdown(f"**Trend Analysis:** {campaign['trend_focus']}")
+                st.markdown(f"**Budget:** ${campaign['budget']:,}")
+                st.markdown(f"**Projected ROI:** {campaign['expected_roi']}")
+                
+            with col_demo2:
+                if st.button(f"🎬 Launch Celebrity Demo", key=f"demo_{i}", type="primary"):
+                    # Pre-populate session state with celebrity campaign
+                    st.session_state.campaign_params = {
+                        'topic': campaign['title'].replace(' Launch', '').replace(' Campaign', '').replace(' Empire', ''),
+                        'brand': campaign['brand'],
+                        'budget': campaign['budget'],
+                        'market_region': "Global",
+                        'trend_depth': "Comprehensive",
+                        'creativity_level': "Celebrity-Level Bold",
+                        'include_live_data': True,
+                        'celebrity_focus': campaign['celebrity_angle']
+                    }
+                    
+                    # Generate celebrity-focused demo results
+                    demo_results = {
+                        'viral_potential_score': 9.7,
+                        'engagement_rate': 97.3,
+                        'roi_prediction': int(campaign['expected_roi'].replace('%', '')),
+                        'conversion_rate': 23.4,
+                        'celebrity_impact_score': 94.8,
+                        'creative_assets': {
+                            'headlines': [
+                                f"{campaign['celebrity_angle'].split(' ')[0]} Reveals: {campaign['trend_focus']} Changes Everything",
+                                f"Exclusive: {campaign['brand']} - The Celebrity Secret Finally Revealed",
+                                f"Celebrity Endorsed: {campaign['trend_focus']} Revolution Starts Here"
+                            ],
+                            'video_scripts': [
+                                f"30-sec Celebrity Testimonial: '{campaign['celebrity_angle']}'",
+                                f"60-sec Behind-the-Scenes: Celebrity using {campaign['brand']}"
+                            ]
+                        },
+                        'budget_allocation': {
+                            'allocation': {
+                                'celebrity_endorsement': 35,
+                                'social_media': 25,
+                                'influencer_partnerships': 20,
+                                'content_creation': 12,
+                                'traditional_media': 8
+                            }
+                        },
+                        'personalization_matrix': {
+                            'email_sequence': [
+                                {'subject': f'Celebrity Secret: {campaign["trend_focus"]} Revealed'},
+                                {'subject': f'Exclusive {campaign["brand"]} Celebrity Access'},
+                                {'subject': 'Your Celebrity Transformation Starts Now'},
+                                {'subject': 'Celebrity Insider Tips Just for You'},
+                                {'subject': 'Last Chance: Celebrity-Endorsed Exclusive'}
+                            ]
+                        },
+                        'analytics_interpreter': {
+                            'improvement_tips': [
+                                f'Celebrity endorsement increases brand trust by 67% in {campaign["trend_focus"]} sector',
+                                'Partner with celebrity fan communities for authentic engagement',
+                                'Leverage celebrity social proof to reduce purchase hesitation by 45%'
+                            ]
+                        },
+                        'celebrity_metrics': {
+                            'brand_lift': '+89%',
+                            'social_mentions': '+234%',
+                            'purchase_intent': '+156%'
+                        }
+                    }
+                    
+                    st.session_state.campaign_results = demo_results
+                    st.success(f"Celebrity campaign '{campaign['title']}' loaded! Navigate to AI Agents Studio to watch the celebrity-focused workflow, then Analytics Center for results.")
+    
     # Real-time market indicators
+    st.markdown("### 📊 Live Market Intelligence")
     col_indicator1, col_indicator2, col_indicator3 = st.columns(3)
     
     with col_indicator1:
@@ -2954,26 +3094,89 @@ def analytics_center():
             help="Live conversion tracking across channels"
         )
     
+    # Celebrity campaign metrics if available
+    if 'celebrity_impact_score' in results:
+        st.subheader("Celebrity Campaign Impact")
+        col_celebrity1, col_celebrity2, col_celebrity3 = st.columns(3)
+        
+        with col_celebrity1:
+            st.metric(
+                "Celebrity Impact Score", 
+                f"{results['celebrity_impact_score']:.1f}/100",
+                "▲ Celebrity boost active"
+            )
+        with col_celebrity2:
+            celebrity_metrics = results.get('celebrity_metrics', {})
+            st.metric(
+                "Brand Lift", 
+                celebrity_metrics.get('brand_lift', '+89%'),
+                "Celebrity endorsement effect"
+            )
+        with col_celebrity3:
+            st.metric(
+                "Social Mentions", 
+                celebrity_metrics.get('social_mentions', '+234%'),
+                "Celebrity-driven engagement"
+            )
+    
     # Campaign assets
     st.subheader("Generated Campaign Assets")
     
     col_left, col_right = st.columns(2)
     
     with col_left:
-        st.markdown("**AI-Generated Headlines:**")
-        headlines = results.get('creative_assets', {}).get('headlines', [
-            "Revolutionary AI Solutions", "Transform Your Business Today", "The Future is Now"
-        ])
-        for i, headline in enumerate(headlines[:3], 1):
-            st.write(f"{i}. {headline}")
+        if 'celebrity_impact_score' in results:
+            st.markdown("**Celebrity-Enhanced Headlines:**")
+            headlines = results.get('creative_assets', {}).get('headlines', [])
+            for i, headline in enumerate(headlines[:3], 1):
+                celebrity_boost = "+67%" if i == 1 else "+45%" if i == 2 else "+38%"
+                st.write(f"{i}. {headline}")
+                st.caption(f"Celebrity impact: {celebrity_boost} engagement boost")
+        else:
+            st.markdown("**AI-Generated Headlines:**")
+            headlines = results.get('creative_assets', {}).get('headlines', [
+                "Revolutionary AI Solutions", "Transform Your Business Today", "The Future is Now"
+            ])
+            for i, headline in enumerate(headlines[:3], 1):
+                st.write(f"{i}. {headline}")
     
     with col_right:
-        st.markdown("**Budget Allocation:**")
+        st.markdown("**Strategic Budget Allocation:**")
         allocation = results.get('budget_allocation', {}).get('allocation', {
             'social_media': 35, 'search_ads': 25, 'display': 20, 'email_marketing': 15, 'content_creation': 5
         })
         for channel, percentage in allocation.items():
-            st.write(f"• {channel.replace('_', ' ').title()}: {percentage}%")
+            if channel == 'celebrity_endorsement':
+                st.write(f"🌟 {channel.replace('_', ' ').title()}: {percentage}%")
+            else:
+                st.write(f"• {channel.replace('_', ' ').title()}: {percentage}%")
+    
+    # Celebrity campaign additional insights
+    if 'celebrity_impact_score' in results:
+        st.subheader("Celebrity Campaign Intelligence")
+        
+        col_insight1, col_insight2 = st.columns(2)
+        
+        with col_insight1:
+            st.markdown("**Celebrity Strategy Results:**")
+            celebrity_metrics = results.get('celebrity_metrics', {})
+            st.write(f"• Brand Trust Increase: {celebrity_metrics.get('brand_lift', '+89%')}")
+            st.write(f"• Social Media Buzz: {celebrity_metrics.get('social_mentions', '+234%')}")
+            st.write(f"• Purchase Intent Boost: {celebrity_metrics.get('purchase_intent', '+156%')}")
+            
+        with col_insight2:
+            st.markdown("**Celebrity Marketing Tips:**")
+            celebrity_tips = results.get('analytics_interpreter', {}).get('improvement_tips', [])
+            for tip in celebrity_tips:
+                st.write(f"💡 {tip}")
+                
+        # Celebrity email sequence preview
+        if 'email_sequence' in results.get('personalization_matrix', {}):
+            st.markdown("**Celebrity-Endorsed Email Campaign:**")
+            email_sequence = results['personalization_matrix']['email_sequence']
+            for i, email in enumerate(email_sequence[:3], 1):
+                st.write(f"Email {i}: {email.get('subject', 'Subject line')}")
+                st.caption("Celebrity endorsement integrated for maximum impact")
 
 def campaign_manager_dashboard():
     """Campaign management dashboard."""
