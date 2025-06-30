@@ -385,10 +385,10 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
     </div>
 
     <style>
-        @keyframes pulse {
-            0% { opacity: 0.1; transform: scale(1); }
-            100% { opacity: 0.3; transform: scale(1.05); }
-        }
+        @keyframes pulse {{
+            0% {{ opacity: 0.1; transform: scale(1); }}
+            100% {{ opacity: 0.3; transform: scale(1.05); }}
+        }}
     </style>
     """, unsafe_allow_html=True)
 
