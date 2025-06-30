@@ -252,25 +252,126 @@ def main():
     if not initialize_agents():
         st.stop()
     
-    # Real-time dashboard header with live metrics
+    # Enterprise-grade dashboard header with advanced styling
     current_time = datetime.now().strftime("%H:%M:%S")
     st.markdown(f"""
     <div style="
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 20px;
-        padding: 2rem;
-        margin: 1rem 0 2rem 0;
+        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+        border: 1px solid rgba(64, 224, 208, 0.3);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        margin: 0 0 3rem 0;
         color: white;
         text-align: center;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        box-shadow: 
+            0 25px 50px rgba(0,0,0,0.25),
+            inset 0 1px 0 rgba(255,255,255,0.1);
         position: relative;
+        backdrop-filter: blur(20px);
     ">
-        <div style="position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">
-            🟢 LIVE • {current_time}
+        <div style="
+            position: absolute; 
+            top: 1.5rem; 
+            right: 2rem; 
+            background: linear-gradient(45deg, #00ff88, #00d4ff);
+            padding: 0.8rem 1.5rem; 
+            border-radius: 30px; 
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #000;
+            box-shadow: 0 5px 15px rgba(0,255,136,0.3);
+        ">
+            ⚡ NEURAL ACTIVE • {current_time}
         </div>
-        <h1 style="margin: 0 0 0.5rem 0; font-size: 2.5rem; font-weight: 700;">Neural AdBrain Dashboard</h1>
-        <p style="margin: 0; font-size: 1.2rem; opacity: 0.9;">Real-Time AI Campaign Intelligence Platform</p>
+        
+        <div style="
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 400% 400%;
+            animation: gradient 3s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        ">
+            <h1 style="margin: 0; font-size: 3.2rem; font-weight: 800; letter-spacing: -0.02em;">
+                QUANTUM MARKETING NEXUS
+            </h1>
+        </div>
+        
+        <p style="
+            margin: 0; 
+            font-size: 1.4rem; 
+            opacity: 0.85;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 500;
+        ">
+            Advanced Neural Intelligence • Real-Time Market Analytics • Enterprise Campaign Orchestration
+        </p>
+        
+        <div style="
+            margin-top: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        ">
+            <div style="
+                background: linear-gradient(135deg, rgba(0,255,136,0.15) 0%, rgba(0,255,136,0.05) 100%);
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                border: 1px solid rgba(0,255,136,0.4);
+                text-align: center;
+                backdrop-filter: blur(10px);
+            ">
+                <div style="color: #00ff88; font-weight: 600; font-size: 1.1rem;">NEURAL COGNITIVE SYSTEM</div>
+                <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 0.3rem;">6 Advanced AI Agents</div>
+            </div>
+            <div style="
+                background: linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(0,212,255,0.05) 100%);
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                border: 1px solid rgba(0,212,255,0.4);
+                text-align: center;
+                backdrop-filter: blur(10px);
+            ">
+                <div style="color: #00d4ff; font-weight: 600; font-size: 1.1rem;">QUANTUM INTELLIGENCE</div>
+                <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 0.3rem;">Real-Time Market Synthesis</div>
+            </div>
+            <div style="
+                background: linear-gradient(135deg, rgba(255,107,107,0.15) 0%, rgba(255,107,107,0.05) 100%);
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                border: 1px solid rgba(255,107,107,0.4);
+                text-align: center;
+                backdrop-filter: blur(10px);
+            ">
+                <div style="color: #ff6b6b; font-weight: 600; font-size: 1.1rem;">PREDICTIVE ANALYTICS</div>
+                <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 0.3rem;">Enterprise Forecasting Engine</div>
+            </div>
+        </div>
     </div>
+    
+    <style>
+        @keyframes gradient {{
+            0% {{ background-position: 0% 50%; }}
+            50% {{ background-position: 100% 50%; }}
+            100% {{ background-position: 0% 50%; }}
+        }}
+        
+        .metric-card {{
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }}
+        
+        .metric-card:hover {{
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }}
+    </style>
     """, unsafe_allow_html=True)
     
     # Real-time controls without auto-refresh
@@ -283,33 +384,83 @@ def main():
     with col_refresh3:
         st.write(f"Last update: {current_time}")
     
-    # Dashboard navigation
+    # Professional Enterprise Command Interface
+    st.markdown("""
+    <div style="
+        background: linear-gradient(135deg, rgba(15,15,35,0.98) 0%, rgba(26,26,46,0.98) 100%);
+        border: 2px solid rgba(64, 224, 208, 0.3);
+        border-radius: 16px;
+        padding: 2.5rem;
+        margin: 3rem 0;
+        backdrop-filter: blur(20px);
+        box-shadow: 
+            0 20px 40px rgba(0,0,0,0.3),
+            inset 0 1px 0 rgba(255,255,255,0.1);
+    ">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h2 style="
+                color: #00d4ff; 
+                margin: 0 0 0.5rem 0; 
+                font-weight: 700;
+                font-size: 2rem;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+            ">QUANTUM COMMAND CENTER</h2>
+            <p style="
+                color: rgba(255,255,255,0.8); 
+                margin: 0; 
+                font-size: 1.1rem;
+                font-weight: 300;
+            ">Enterprise-Grade Neural Module Orchestration</p>
+        </div>
+        
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        ">
+            <div style="background: rgba(255,107,107,0.1); padding: 0.8rem; border-radius: 10px; border: 1px solid rgba(255,107,107,0.3); text-align: center;">
+                <span style="color: #ff6b6b; font-weight: 500;">⚡ CAMPAIGN ENGINE</span>
+            </div>
+            <div style="background: rgba(0,255,136,0.1); padding: 0.8rem; border-radius: 10px; border: 1px solid rgba(0,255,136,0.3); text-align: center;">
+                <span style="color: #00ff88; font-weight: 500;">🧬 NEURAL PROCESSOR</span>
+            </div>
+            <div style="background: rgba(0,212,255,0.1); padding: 0.8rem; border-radius: 10px; border: 1px solid rgba(0,212,255,0.3); text-align: center;">
+                <span style="color: #00d4ff; font-weight: 500;">📊 ANALYTICS HUB</span>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Professional module selection interface
     dashboard_nav = st.selectbox(
-        "Select Dashboard Module",
+        "QUANTUM MODULE SELECTION",
         [
-            "📊 Campaign Dashboard",
-            "🤖 AI Agents Studio", 
-            "📈 Analytics Center", 
-            "⚙️ Campaign Manager",
-            "💬 AI Assistant",
-            "🏢 Business Hub"
+            "⚡ Campaign Orchestrator • Strategic Campaign Development & Celebrity Integration",
+            "🧬 Neural Agents Engine • Advanced AI Processing & Real-Time Optimization", 
+            "📊 Intelligence Analytics • Predictive Insights & Market Intelligence", 
+            "🎯 Portfolio Manager • Enterprise Campaign Lifecycle Management",
+            "🤖 Nexus Assistant • Strategic Marketing Intelligence & Consultation",
+            "🚀 Enterprise Hub • Business Development & Partnership Orchestration"
         ],
-        index=0
+        index=0,
+        help="Select enterprise neural modules for advanced campaign orchestration and market intelligence"
     )
     
-    # Route to different dashboard modules
-    if dashboard_nav == "📊 Campaign Dashboard":
-        campaign_dashboard()
-    elif dashboard_nav == "🤖 AI Agents Studio":
-        ai_agents_studio()
-    elif dashboard_nav == "📈 Analytics Center":
-        analytics_center()
-    elif dashboard_nav == "⚙️ Campaign Manager":
-        campaign_manager_dashboard()
-    elif dashboard_nav == "💬 AI Assistant":
-        ai_chat_assistant_page()
-    elif dashboard_nav == "🏢 Business Hub":
-        business_development_hub()
+    # Enterprise module routing with advanced neural processing
+    if "Campaign Orchestrator" in dashboard_nav:
+        campaign_orchestrator_engine()
+    elif "Neural Agents Engine" in dashboard_nav:
+        neural_agents_processing_center()
+    elif "Intelligence Analytics" in dashboard_nav:
+        intelligence_analytics_hub()
+    elif "Portfolio Manager" in dashboard_nav:
+        enterprise_portfolio_manager()
+    elif "Nexus Assistant" in dashboard_nav:
+        nexus_ai_assistant()
+    elif "Enterprise Hub" in dashboard_nav:
+        enterprise_development_hub()
 
 def campaign_setup_page():
     """Campaign setup with guided form interface."""
@@ -1937,8 +2088,8 @@ def campaign_history_page():
                         st.success("Campaign deleted!")
                         st.rerun()
 
-def ai_chat_assistant_page():
-    """AI Chat Assistant for advertising trends and campaign knowledge."""
+def nexus_ai_assistant():
+    """Nexus AI Assistant for advanced marketing intelligence and strategic consultation."""
     
     st.markdown("""
     <div style="
@@ -2264,8 +2415,8 @@ def settings_page():
     for key, value in system_info.items():
         st.write(f"**{key}:** {value}")
 
-def business_development_hub():
-    """Comprehensive Business Development Hub implementing strategic marketing plan."""
+def enterprise_development_hub():
+    """Enterprise Development Hub with strategic partnerships and advanced business intelligence."""
     
     st.markdown("""
     <div style="
@@ -2681,8 +2832,8 @@ def create_extraordinary_agent_card(name, description, status, execution_time=0.
         
         st.divider()
 
-def campaign_dashboard():
-    """Real-time campaign dashboard with live market data and demo campaigns."""
+def campaign_orchestrator_engine():
+    """Enterprise Campaign Orchestrator with neural market intelligence and celebrity strategy deployment."""
     
     current_time = datetime.now().strftime("%H:%M:%S")
     st.markdown(f"""
@@ -2912,8 +3063,8 @@ def campaign_dashboard():
             else:
                 st.error("Please provide both topic and brand name.")
 
-def ai_agents_studio():
-    """Real-time AI agents execution with live monitoring - pure Streamlit components."""
+def neural_agents_processing_center():
+    """Enterprise Neural Agents Processing Center with real-time cognitive orchestration."""
     
     current_time = datetime.now().strftime("%H:%M:%S")
     
@@ -2994,8 +3145,8 @@ def ai_agents_studio():
             st.error(f"Agent execution failed: {str(e)}")
             st.session_state.campaign_results = create_fallback_results(campaign_params)
 
-def analytics_center():
-    """Real-time analytics center with live data streaming - pure Streamlit components."""
+def intelligence_analytics_hub():
+    """Enterprise Intelligence Analytics Hub with advanced neural network predictions and market intelligence."""
     
     import datetime as dt
     current_time = dt.datetime.now().strftime("%H:%M:%S")
@@ -3495,8 +3646,8 @@ def analytics_center():
                 st.write(f"Email {i}: {email.get('subject', 'Subject line')}")
                 st.caption("Celebrity endorsement integrated for maximum impact")
 
-def campaign_manager_dashboard():
-    """Campaign management dashboard."""
+def enterprise_portfolio_manager():
+    """Enterprise Portfolio Manager with advanced campaign lifecycle management."""
     
     st.markdown("""
     <div style="
