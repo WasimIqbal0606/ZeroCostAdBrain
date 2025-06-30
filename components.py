@@ -1,3 +1,7 @@
+Fixing f-string syntax errors in CSS keyframes by adding curly braces around the content inside the keyframes.
+```
+
+```python
 """
 Next-level cyberpunk UI components for the Neural AdBrain platform.
 Implements cutting-edge design with advertising-focused neural network visualization.
@@ -113,6 +117,61 @@ def render_hero_section():
         color: white !important;
         font-weight: 600 !important;
     }
+
+    /* Button gradient animation */
+    .gradient-button {
+        text-decoration: none;
+        padding: 15px 30px;
+        text-align: center;
+        letter-spacing: 1px;
+        transition: 0.3s;
+    }
+
+    /* Add a glow effect on hover */
+    .gradient-button:hover {
+        box-shadow: 0 0 20px rgba(100, 255, 218, 0.6);
+    }
+
+    /* Keyframes for background gradient shift */
+    @keyframes gradientShift {{
+        0% {{
+            background-position: 0% 50%;
+        }}
+        50% {{
+            background-position: 100% 50%;
+        }}
+        100% {{
+            background-position: 0% 50%;
+        }}
+    }}
+
+    /* Apply the gradient animation */
+    .animated-gradient {
+        animation: gradientShift 8s ease infinite;
+        background: linear-gradient(270deg, #00bcd4, #4caf50, #009688);
+        background-size: 200% 200%;
+    }
+
+    /* Button-specific gradient animation */
+    @keyframes buttonGradient {{
+        0% {{ background-position: 0% 50%; }}
+        50% {{ background-position: 100% 50%; }}
+        100% {{ background-position: 0% 50%; }}
+    }}
+    
+    /* Glow effect animation */
+    @keyframes textGlow {{
+        0% {{ background-position: 0% 50%; }}
+        100% {{ background-position: 200% 50%; }}
+    }}
+
+    /* Floating animation */
+    @keyframes float {{
+        0% {{ transform: translateY(0px); }}
+        50% {{ transform: translateY(-10px); }}
+        100% {{ transform: translateY(0px); }}
+    }}
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -330,7 +389,7 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
     </div>
 
     <style>
-        @keyframes pulse {
+        @keyframes pulse {{
             0% {{ opacity: 0.1; transform: scale(1); }}
             100% {{ opacity: 0.3; transform: scale(1.05); }}
         }}
@@ -462,10 +521,10 @@ def render_campaign_results_panel(results: Dict):
     </div>
 
     <style>
-        @keyframes resultsPulse {
-            0% { opacity: 0.8; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.02); }
-        }
+        @keyframes resultsPulse {{
+            0% {{ opacity: 0.8; transform: scale(1); }}
+            100% {{ opacity: 1; transform: scale(1.02); }}
+        }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -595,3 +654,4 @@ def render_campaign_form():
             help="Your brand or company name",
             key="brand_name_input"
         )
+</replit_final_file>
