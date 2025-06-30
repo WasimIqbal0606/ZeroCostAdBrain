@@ -3021,10 +3021,61 @@ def intelligence_analytics_hub():
     if st.button("🔄 Refresh Analytics Data"):
         st.rerun()
     
+    # Debug session state
+    st.write("**Session State Debug:**")
+    st.write(f"Campaign results in session: {'campaign_results' in st.session_state}")
+    if 'campaign_results' in st.session_state:
+        st.write(f"Results type: {type(st.session_state.campaign_results)}")
+        st.write(f"Results keys: {list(st.session_state.campaign_results.keys()) if isinstance(st.session_state.campaign_results, dict) else 'Not a dict'}")
+    
+    # Manual test button for injecting sample results
+    if st.button("🧪 Inject Test Campaign Results"):
+        st.session_state.campaign_results = {
+            'topic': 'AI Marketing',
+            'brand': 'TechCorp',
+            'meme_harvester': {
+                'trending_phrases': ['AI revolution', 'Neural networks', 'Machine learning magic', 'Digital transformation', 'Future tech']
+            },
+            'narrative_aligner': {
+                'story_hook': 'Transform your business with AI-powered marketing that thinks faster than human creativity',
+                'brand_alignment_score': 9.2
+            },
+            'copy_crafter': {
+                'headlines': ['AI That Thinks Faster Than You', 'Neural Marketing Revolution', 'Smart Campaigns, Smarter Results'],
+                'video_scripts': ['30-second script about AI transformation...', 'Video script for social media engagement...']
+            },
+            'hook_optimizer': {
+                'optimization_score': 8.7
+            },
+            'budget_allocation': {
+                'efficiency_score': 9.1,
+                'allocation': {
+                    'social_media': 35,
+                    'search_ads': 25,
+                    'display': 20,
+                    'email_marketing': 15,
+                    'content_creation': 5
+                }
+            },
+            'sequence_planner': {
+                'email_sequence': [
+                    {'subject': 'Welcome to AI Marketing', 'content': 'Introduction email content'},
+                    {'subject': 'Your AI Journey Begins', 'content': 'Second email content'}
+                ]
+            },
+            'analytics_interpreter': {
+                'improvement_tips': ['Increase social media budget by 10%', 'Focus on video content', 'Test mobile-first campaigns']
+            },
+            'viral_potential_score': 8.7
+        }
+        st.success("Test results injected! Refresh page to see analytics.")
+        st.rerun()
+    
     # Real-time market intelligence integration
     if 'campaign_results' not in st.session_state:
         st.warning("🔄 No campaign results detected. Execute agents first in the AI Agents section.")
         st.info("💡 Go to AI Agents → Run campaign workflow to generate analytics data")
+        st.info("Or use the test button above to see sample analytics display")
         return
     
     results = st.session_state.campaign_results
