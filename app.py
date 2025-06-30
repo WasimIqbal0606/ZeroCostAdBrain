@@ -273,21 +273,15 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Real-time auto-refresh controls
+    # Real-time controls without auto-refresh
     col_refresh1, col_refresh2, col_refresh3 = st.columns([2, 1, 1])
     with col_refresh1:
-        auto_refresh = st.checkbox("Auto-refresh every 5 seconds", value=True)
+        st.info("Real-time data streaming - Dashboard updates automatically")
     with col_refresh2:
-        if st.button("🔄 Refresh Now"):
+        if st.button("🔄 Refresh Data"):
             st.rerun()
     with col_refresh3:
         st.write(f"Last update: {current_time}")
-    
-    # Auto-refresh implementation
-    if auto_refresh:
-        import time
-        time.sleep(0.1)  # Small delay to prevent excessive refreshing
-        st.rerun()
     
     # Dashboard navigation
     dashboard_nav = st.selectbox(
