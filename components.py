@@ -317,80 +317,84 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
         'waiting': {'color': '#415A77', 'icon': '◯', 'bg': 'rgba(65, 90, 119, 0.15)', 'glow': 'rgba(65, 90, 119, 0.4)'},
         'running': {'color': '#FF006E', 'icon': '◐', 'bg': 'rgba(255, 0, 110, 0.15)', 'glow': 'rgba(255, 0, 110, 0.6)'},
         'completed': {'color': '#00F5FF', 'icon': '●', 'bg': 'rgba(0, 245, 255, 0.15)', 'glow': 'rgba(0, 245, 255, 0.6)'},
-        'error': {'color': '#FB5607', 'icon': '⚡', 'bg': 'rgba(251, 86, 7, 0.15)', 'glow': 'rgba(251, 86, 7, 0.6)'}
+        'error': {'color': '#FB5607', 'icon': '⚡', 'bg': 'rgba(251, 86, 7, 0.15)', 'glow': 'rgba(251, 86, 7, 0.6)'},
+        'idle': {'color': '#6B7280', 'icon': '○', 'bg': 'rgba(107, 114, 128, 0.15)', 'glow': 'rgba(107, 114, 128, 0.4)'}
     }
 
     config = status_config.get(status, status_config['waiting'])
 
-    st.markdown(f"""
-    <div style="
-        background: linear-gradient(135deg, rgba(13, 27, 42, 0.8), {config['bg']});
-        border: 1px solid {config['color']}80;
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin: 0.8rem 0;
-        backdrop-filter: blur(20px);
-        box-shadow: 
-            0 8px 32px rgba(0,0,0,0.3),
-            0 0 0 1px {config['glow']},
-            inset 0 1px 0 rgba(255,255,255,0.1);
-        transition: all 0.4s ease;
-        position: relative;
-        overflow: hidden;
-    ">
+    # Use a container to ensure proper rendering
+    container = st.container()
+    with container:
+        st.markdown(f"""
         <div style="
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 50% 50%, {config['glow']} 0%, transparent 70%);
-            opacity: 0.1;
-            animation: pulse 2s ease-in-out infinite alternate;
-        "></div>
-
-        <div style="display: flex; align-items: center; gap: 1.5rem; position: relative; z-index: 2;">
+            background: linear-gradient(135deg, rgba(13, 27, 42, 0.8), {config['bg']});
+            border: 1px solid {config['color']}80;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 0.8rem 0;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.3),
+                0 0 0 1px {config['glow']},
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        ">
             <div style="
-                font-size: 2rem;
-                color: {config['color']};
-                width: 50px;
-                height: 50px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: linear-gradient(135deg, {config['bg']}, rgba(0,0,0,0.3));
-                border-radius: 50%;
-                border: 2px solid {config['color']};
-                box-shadow: 0 0 20px {config['glow']};
-                text-shadow: 0 0 10px {config['color']};
-            ">{config['icon']}</div>
-            <div style="flex: 1;">
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: radial-gradient(circle at 50% 50%, {config['glow']} 0%, transparent 70%);
+                opacity: 0.1;
+                animation: pulse 2s ease-in-out infinite alternate;
+            "></div>
+
+            <div style="display: flex; align-items: center; gap: 1.5rem; position: relative; z-index: 2;">
                 <div style="
-                    font-size: 1.3rem;
-                    font-weight: 700;
+                    font-size: 2rem;
                     color: {config['color']};
-                    margin-bottom: 0.5rem;
-                    text-shadow: 0 0 10px {config['glow']};
-                    letter-spacing: 0.5px;
-                ">{agent_name}</div>
-                <div style="
-                    font-size: 1rem;
-                    color: rgba(255,255,255,0.9);
-                    line-height: 1.5;
-                    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-                ">{description}</div>
-                {f'<div style="font-size: 0.9rem; color: {config["color"]}; margin-top: 0.5rem; font-weight: 600;">Neural processing: {execution_time:.1f}s</div>' if status == 'completed' else ''}
+                    width: 50px;
+                    height: 50px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: linear-gradient(135deg, {config['bg']}, rgba(0,0,0,0.3));
+                    border-radius: 50%;
+                    border: 2px solid {config['color']};
+                    box-shadow: 0 0 20px {config['glow']};
+                    text-shadow: 0 0 10px {config['color']};
+                ">{config['icon']}</div>
+                <div style="flex: 1;">
+                    <div style="
+                        font-size: 1.3rem;
+                        font-weight: 700;
+                        color: {config['color']};
+                        margin-bottom: 0.5rem;
+                        text-shadow: 0 0 10px {config['glow']};
+                        letter-spacing: 0.5px;
+                    ">{agent_name}</div>
+                    <div style="
+                        font-size: 1rem;
+                        color: rgba(255,255,255,0.9);
+                        line-height: 1.5;
+                        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+                    ">{description}</div>
+                    {f'<div style="font-size: 0.9rem; color: {config["color"]}; margin-top: 0.5rem; font-weight: 600;">Neural processing: {execution_time:.1f}s</div>' if status == 'completed' else ''}
+                </div>
             </div>
         </div>
-    </div>
 
-    <style>
-        @keyframes pulse {{
-            0% {{ opacity: 0.1; transform: scale(1); }}
-            100% {{ opacity: 0.3; transform: scale(1.05); }}
-        }}
-    </style>
-    """, unsafe_allow_html=True)
+        <style>
+            @keyframes pulse {{
+                0% {{ opacity: 0.1; transform: scale(1); }}
+                100% {{ opacity: 0.3; transform: scale(1.05); }}
+            }}
+        </style>
+        """, unsafe_allow_html=True)
 
 def render_metrics_dashboard(metrics: Dict):
     """Render cyberpunk metrics dashboard."""
