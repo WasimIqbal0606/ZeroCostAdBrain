@@ -2077,6 +2077,8 @@ def get_marketing_expert_response(question: str) -> str:
                 response = model.generate_content(prompt)
                 if response.text:
                     return response.text
+            except ImportError:
+                print("Google Generative AI not available")
             except Exception as e:
                 print(f"Gemini API error: {e}")
         

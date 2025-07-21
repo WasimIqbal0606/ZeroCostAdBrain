@@ -7,14 +7,16 @@ Each agent specializes in a specific aspect of campaign creation.
 import os
 import json
 import requests
-from typing import Dict, List, Any
+from typing import Dict, Any
 import logging
 
 # Try to import Gemini, but handle if not available
 try:
     import google.generativeai as genai
+    GENAI_AVAILABLE = True
 except ImportError:
     genai = None
+    GENAI_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -31,7 +33,7 @@ class AIAgent:
     def setup_clients(self):
         """Setup AI model clients."""
         try:
-            if genai and os.getenv("GEMINI_API_KEY"):
+            if GENAI_AVAILABLE and os.getenv("GEMINI_API_KEY"):
                 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
                 self.gemini_configured = True
             else:
@@ -125,7 +127,7 @@ class AIAgent:
     def call_gemini_api(self, prompt: str) -> str:
         """Call Gemini API."""
         try:
-            if not self.gemini_configured:
+            if not self.gemini_configured or not GENAI_AVAILABLE:
                 return "Gemini client not available"
             
             model = genai.GenerativeModel('gemini-1.5-flash')
