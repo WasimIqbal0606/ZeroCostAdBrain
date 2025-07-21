@@ -1,0 +1,86 @@
+`typing.List` imported but unused
+(pyright-extended)
+Ln 10, Col 26
+Import "google.generativeai" could not be resolved
+(pyright-extended)
+Ln 15, Col 12
+"GenerativeModel" is not a known member of "None"
+(pyright-extended)
+Ln 131, Col 27
+Do not use bare `except`
+(pyright-extended)
+Ln 205, Col 13
+Expression of type "None" cannot be assigned to parameter of type "Dict[Unknown, Unknown]"   "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 257, Col 47
+`typing.Annotated` imported but unused
+(pyright-extended)
+Ln 7, Col 58
+Expression of type "type[StateGraph[StateT@StateGraph, InputT@StateGraph, OutputT@StateGraph]]" cannot be assigned to declared type "type[StateGraph]"   "type[StateGraph[StateT@StateGraph, InputT@StateGraph, OutputT@StateGraph]]" is incompatible with "type[StateGraph]"   Type "type[StateGraph[StateT@StateGraph, InputT@StateGraph, OutputT@StateGraph]]" cannot be assigned to type "type[StateGraph]"
+(pyright-extended)
+Ln 12, Col 33
+Expression of type "MemorySaver" cannot be assigned to declared type "type[MemorySaver]"   "MemorySaver" is incompatible with "type[MemorySaver]"   Type "MemorySaver" cannot be assigned to type "type[MemorySaver]"
+(pyright-extended)
+Ln 13, Col 45
+`langchain_core.messages.HumanMessage` imported but unused; consider using `importlib.util.find_spec` to test for availability
+(pyright-extended)
+Ln 14, Col 41
+`langchain_core.messages.AIMessage` imported but unused; consider using `importlib.util.find_spec` to test for availability
+(pyright-extended)
+Ln 14, Col 55
+`langchain_core.messages.SystemMessage` imported but unused; consider using `importlib.util.find_spec` to test for availability
+(pyright-extended)
+Ln 14, Col 66
+`langchain_core.tools.tool` imported but unused; consider using `importlib.util.find_spec` to test for availability
+(pyright-extended)
+Ln 16, Col 38
+`operator` imported but unused
+(pyright-extended)
+Ln 34, Col 8
+"get" is not a known member of "None"
+(pyright-extended)
+Ln 199, Col 48
+Argument of type "Dict[str, Any] | None" cannot be assigned to parameter "cultural_context" of type "Dict[Unknown, Unknown]" in function "_synthesize_neurosymbolic_insights"   Type "Dict[str, Any] | None" cannot be assigned to type "Dict[Unknown, Unknown]"     "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 211, Col 13
+Argument of type "Dict[str, Any] | None" cannot be assigned to parameter "cultural_context" of type "Dict[Unknown, Unknown]" in function "_create_narrative_framework"   Type "Dict[str, Any] | None" cannot be assigned to type "Dict[Unknown, Unknown]"     "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 238, Col 13
+Argument of type "Dict[str, Any] | None" cannot be assigned to parameter "trend_signals" of type "Dict[Unknown, Unknown]" in function "_create_narrative_framework"   Type "Dict[str, Any] | None" cannot be assigned to type "Dict[Unknown, Unknown]"     "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 239, Col 13
+Object of type "None" is not subscriptable
+(pyright-extended)
+Ln 269, Col 36
+Object of type "None" is not subscriptable
+(pyright-extended)
+Ln 271, Col 34
+Argument of type "Dict[str, Any] | None" cannot be assigned to parameter "cultural_resonance" of type "Dict[Unknown, Unknown]" in function "_optimize_creative_assets"   Type "Dict[str, Any] | None" cannot be assigned to type "Dict[Unknown, Unknown]"     "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 283, Col 13
+Argument of type "Dict[str, Any] | None" cannot be assigned to parameter "trend_signals" of type "Dict[Unknown, Unknown]" in function "_perform_causal_impact_analysis"   Type "Dict[str, Any] | None" cannot be assigned to type "Dict[Unknown, Unknown]"     "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 318, Col 13
+Argument of type "Dict[str, Any] | None" cannot be assigned to parameter "creative_assets" of type "Dict[Unknown, Unknown]" in function "_create_personalization_matrix"   Type "Dict[str, Any] | None" cannot be assigned to type "Dict[Unknown, Unknown]"     "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 352, Col 13
+Argument of type "Dict[str, Any] | None" cannot be assigned to parameter "cultural_resonance" of type "Dict[Unknown, Unknown]" in function "_create_personalization_matrix"   Type "Dict[str, Any] | None" cannot be assigned to type "Dict[Unknown, Unknown]"     "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 353, Col 13
+Argument of type "Dict[str, Any] | None" cannot be assigned to parameter "creative_assets" of type "Dict[Unknown, Unknown]" in function "_calculate_viral_potential"   Type "Dict[str, Any] | None" cannot be assigned to type "Dict[Unknown, Unknown]"     "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 373, Col 13
+Argument of type "Dict[str, Any] | None" cannot be assigned to parameter "cultural_resonance" of type "Dict[Unknown, Unknown]" in function "_calculate_viral_potential"   Type "Dict[str, Any] | None" cannot be assigned to type "Dict[Unknown, Unknown]"     "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 374, Col 13
+Argument of type "Dict[str, Any] | None" cannot be assigned to parameter "personalization_matrix" of type "Dict[Unknown, Unknown]" in function "_calculate_viral_potential"   Type "Dict[str, Any] | None" cannot be assigned to type "Dict[Unknown, Unknown]"     "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 375, Col 13
+Argument of type "Dict[str, Any] | None" cannot be assigned to parameter "trend_signals" of type "Dict[Unknown, Unknown]" in function "_predict_breakthrough_moments"   Type "Dict[str, Any] | None" cannot be assigned to type "Dict[Unknown, Unknown]"     "None" is incompatible with "Dict[Unknown, Unknown]"
+(pyright-extended)
+Ln 382, Col 13
+"RunnableConfig" is possibly unbound
+(pyright-extended)
+Ln 714, Col 18
+"ainvoke" is not a known member of "None"
+(pyright-extended)
