@@ -13,7 +13,6 @@ try:
     from sentence_transformers import SentenceTransformer
     SENTENCE_TRANSFORMERS_AVAILABLE = True
 except ImportError:
-    print("Warning: sentence_transformers not available. Vector similarity features will be limited.")
     SentenceTransformer = None
     SENTENCE_TRANSFORMERS_AVAILABLE = False
 

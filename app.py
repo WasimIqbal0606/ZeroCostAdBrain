@@ -2071,12 +2071,10 @@ def get_marketing_expert_response(question: str) -> str:
     try:
         if os.environ.get("GEMINI_API_KEY"):
             try:
-                from google import genai
-                client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
-                response = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=prompt
-                )
+                import google.generativeai as genai
+                genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+                model = genai.GenerativeModel('gemini-1.5-flash')
+                response = model.generate_content(prompt)
                 if response.text:
                     return response.text
             except Exception as e:

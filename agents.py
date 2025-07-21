@@ -12,7 +12,7 @@ import logging
 
 # Try to import Gemini, but handle if not available
 try:
-    from google import genai as google_genai
+    import google.generativeai as genai
 except ImportError:
     genai = None
 
@@ -32,9 +32,13 @@ class AIAgent:
         """Setup AI model clients."""
         try:
             if genai and os.getenv("GEMINI_API_KEY"):
-                self.gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+                genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+                self.gemini_configured = True
+            else:
+                self.gemini_configured = False
         except Exception as e:
             logger.error(f"Error setting up Gemini client: {e}")
+            self.gemini_configured = False
     
     def call_mistral_api(self, prompt: str, model: str = "mistral-small-latest") -> str:
         """Call La Plateforme Mistral API."""
@@ -121,13 +125,11 @@ class AIAgent:
     def call_gemini_api(self, prompt: str) -> str:
         """Call Gemini API."""
         try:
-            if not self.gemini_client:
+            if not self.gemini_configured:
                 return "Gemini client not available"
             
-            response = self.gemini_client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
-            )
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            response = model.generate_content(prompt)
             
             return response.text or "No response from Gemini"
             
