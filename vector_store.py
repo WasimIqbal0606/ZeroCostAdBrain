@@ -6,8 +6,16 @@ import json
 import numpy as np
 from typing import List, Dict, Any, Optional
 import logging
-from sentence_transformers import SentenceTransformer
 import os
+
+# Try to import sentence_transformers with fallback
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    print("Warning: sentence_transformers not available. Vector similarity features will be limited.")
+    SentenceTransformer = None
+    SENTENCE_TRANSFORMERS_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -26,8 +34,12 @@ class SimpleVectorStore:
     def _initialize_model(self):
         """Initialize the sentence transformer model."""
         try:
-            self.model = SentenceTransformer(self.model_name)
-            logger.info(f"Initialized SentenceTransformer model: {self.model_name}")
+            if SENTENCE_TRANSFORMERS_AVAILABLE:
+                self.model = SentenceTransformer(self.model_name)
+                logger.info(f"Initialized SentenceTransformer model: {self.model_name}")
+            else:
+                self.model = None
+                logger.warning("SentenceTransformer not available, using text-only storage")
         except Exception as e:
             logger.error(f"Error initializing model: {e}")
             self.model = None

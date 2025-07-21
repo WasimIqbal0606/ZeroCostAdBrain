@@ -8,11 +8,29 @@ from typing import Dict, List, Any, Optional, TypedDict, Annotated
 from datetime import datetime
 import json
 
-from langgraph.graph import StateGraph, END
-from langgraph.checkpoint.memory import MemorySaver
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
-from langchain_core.runnables import RunnableConfig
-from langchain_core.tools import tool
+try:
+    from langgraph.graph import StateGraph, END
+    from langgraph.checkpoint.memory import MemorySaver
+    from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+    from langchain_core.runnables import RunnableConfig
+    from langchain_core.tools import tool
+    LANGGRAPH_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: LangGraph not available: {e}")
+    LANGGRAPH_AVAILABLE = False
+    # Define dummy classes/functions for fallback
+    class StateGraph:
+        def __init__(self, *args, **kwargs): pass
+        def add_node(self, *args, **kwargs): pass
+        def add_edge(self, *args, **kwargs): pass
+        def set_entry_point(self, *args, **kwargs): pass
+        def compile(self, *args, **kwargs): return self
+        async def ainvoke(self, *args, **kwargs): return {}
+    
+    class MemorySaver:
+        def __init__(self, *args, **kwargs): pass
+    
+    END = "END"
 import operator
 
 # Import existing agents and services

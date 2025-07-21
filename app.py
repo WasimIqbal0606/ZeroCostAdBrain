@@ -12,16 +12,20 @@ import os
 import asyncio
 import time
 
-# Import our custom modules
-from agents import TrendHarvester, AnalogicalReasoner, CreativeSynthesizer, BudgetOptimizer, PersonalizationAgent
-from vector_store import QdrantVectorStore
-from utils import CampaignManager, export_campaign_to_csv, create_sample_user_profile, format_agent_response, create_budget_chart_data, validate_api_keys
-from n8n_workflow import N8NWorkflowEngine
-from components import (
-    render_hero_section, render_agent_card,
-    render_workflow_visualization, render_metrics_dashboard, render_campaign_results_panel,
-    render_sidebar_navigation, render_loading_animation, render_status_indicator
-)
+# Import our custom modules with error handling
+try:
+    from agents import TrendHarvester, AnalogicalReasoner, CreativeSynthesizer, BudgetOptimizer, PersonalizationAgent
+    from vector_store import QdrantVectorStore
+    from utils import CampaignManager, export_campaign_to_csv, create_sample_user_profile, format_agent_response, create_budget_chart_data, validate_api_keys
+    from n8n_workflow import N8NWorkflowEngine
+    from components import (
+        render_hero_section, render_agent_card,
+        render_workflow_visualization, render_metrics_dashboard, render_campaign_results_panel,
+        render_sidebar_navigation, render_loading_animation, render_status_indicator
+    )
+except ImportError as e:
+    st.error(f"Import error: {e}")
+    st.info("Some modules may be missing dependencies. Please check the installation.")
 
 # Page configuration
 st.set_page_config(
@@ -220,9 +224,13 @@ def initialize_agents():
             st.session_state.budget_optimizer = BudgetOptimizer()
             st.session_state.personalization_agent = PersonalizationAgent()
             st.session_state.agents_initialized = True
+            st.success("🤖 All AI agents initialized successfully!")
             return True
         except Exception as e:
             st.error(f"Error initializing agents: {e}")
+            st.info("💡 Some dependencies may be missing. The app will use fallback functionality.")
+            # Initialize with fallback functionality
+            st.session_state.agents_initialized = "fallback"
             return False
     return True
 

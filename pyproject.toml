@@ -851,7 +851,7 @@ rltrade-test = [{ index = "pytorch-cpu", marker = "platform_system == 'Linux'" }
 rotary-embedding-torch = [{ index = "pytorch-cpu", marker = "platform_system == 'Linux'" }]
 rsp-ml = [{ index = "pytorch-cpu", marker = "platform_system == 'Linux'" }]
 rust-circuit = [{ index = "pytorch-cpu", marker = "platform_system == 'Linux'" }]
-s2fft = [{ index = "pytorch-cpu", marker = "platform_system == 'Linux'" }]
+s2fft = [{ index = "pytorch-cpu", marker = "platform_system == 'Linux'" }, { index = "pytorch-cpu", marker = "platform_system == 'Linux'" }]
 s3prl = [{ index = "pytorch-cpu", marker = "platform_system == 'Linux'" }]
 s3torchconnector = [{ index = "pytorch-cpu", marker = "platform_system == 'Linux'" }]
 saferx = [{ index = "pytorch-cpu", marker = "platform_system == 'Linux'" }]
