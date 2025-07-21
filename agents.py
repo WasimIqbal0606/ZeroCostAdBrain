@@ -12,7 +12,7 @@ import logging
 
 # Try to import Gemini, but handle if not available
 try:
-    from google import genai
+    from google import genai as google_genai
 except ImportError:
     genai = None
 

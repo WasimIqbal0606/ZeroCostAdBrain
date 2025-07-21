@@ -4,9 +4,8 @@ Includes Twitter/Reddit alternatives, news APIs, and marketing resources.
 """
 
 import requests
-import json
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from datetime import datetime, timedelta
 import time
 import random
@@ -95,7 +94,7 @@ class RedditAPI:
     def __init__(self):
         self.base_url = 'https://www.reddit.com'
     
-    def search_subreddits(self, query: str, subreddits: List[str] = None) -> List[Dict]:
+    def find_subreddits(self, search_term: str, communities: List[str] = None) -> List[Dict]:
         """Search Reddit posts from relevant subreddits."""
         if not subreddits:
             subreddits = ['technology', 'business', 'marketing', 'startups', 'innovation']
