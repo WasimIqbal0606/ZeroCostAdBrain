@@ -1,246 +1,309 @@
+
 """
-Utility functions for the multi-agent advertising brain app.
-Includes data management, export functionality, and helper functions.
+Utility functions for the Neural AdBrain platform.
+Includes campaign management, data processing, and helper functions.
 """
 
 import json
-import os
 import csv
-import pandas as pd
+import os
+import uuid
+from typing import Dict, List, Any, Optional
 from datetime import datetime
-from typing import Dict, List, Any
-import streamlit as st
-from database import DatabaseManager
+import pandas as pd
 
 class CampaignManager:
-    """Manages campaign data storage and retrieval with PostgreSQL."""
+    """Manages campaign data storage and retrieval."""
     
-    def __init__(self):
-        self.db = DatabaseManager()
-        # Keep legacy file support as fallback
-        self.campaigns_file = "campaigns.json"
+    def __init__(self, storage_file: str = "campaigns.json"):
+        self.storage_file = storage_file
+        self.campaigns = self._load_campaigns()
+    
+    def _load_campaigns(self) -> Dict:
+        """Load campaigns from storage file."""
+        try:
+            if os.path.exists(self.storage_file):
+                with open(self.storage_file, 'r') as f:
+                    return json.load(f)
+            return {}
+        except Exception as e:
+            print(f"Error loading campaigns: {e}")
+            return {}
+    
+    def save_campaigns(self) -> bool:
+        """Save campaigns to storage file."""
+        try:
+            with open(self.storage_file, 'w') as f:
+                json.dump(self.campaigns, f, indent=2, default=str)
+            return True
+        except Exception as e:
+            print(f"Error saving campaigns: {e}")
+            return False
     
     def save_campaign(self, campaign_data: Dict) -> str:
-        """Save a new campaign to PostgreSQL database."""
-        # Add timestamp and ID if not present
-        if 'id' not in campaign_data:
-            campaign_data['id'] = f"campaign_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        if 'created_at' not in campaign_data:
-            campaign_data['created_at'] = datetime.now().isoformat()
+        """Save a new campaign and return its ID."""
+        campaign_id = str(uuid.uuid4())
+        campaign_data['id'] = campaign_id
+        campaign_data['created_at'] = datetime.now().isoformat()
         
-        # Save to database
-        campaign_id = self.db.save_campaign(campaign_data)
-        
-        # Fallback to file if database fails
-        if not campaign_id:
-            return self._save_campaign_to_file(campaign_data)
+        self.campaigns[campaign_id] = campaign_data
+        self.save_campaigns()
         
         return campaign_id
     
-    def get_campaign(self, campaign_id: str) -> Dict:
-        """Get a specific campaign from database."""
-        campaign = self.db.get_campaign(campaign_id)
-        if campaign:
-            return campaign
-        
-        # Fallback to file
-        return self._get_campaign_from_file(campaign_id)
+    def get_campaign(self, campaign_id: str) -> Optional[Dict]:
+        """Get a specific campaign by ID."""
+        return self.campaigns.get(campaign_id)
     
     def list_campaigns(self) -> List[Dict]:
-        """List all campaigns from database."""
-        campaigns = self.db.list_campaigns()
-        if campaigns:
-            return campaigns
-        
-        # Fallback to file
-        return self._list_campaigns_from_file()
+        """List all campaigns."""
+        return list(self.campaigns.values())
     
     def delete_campaign(self, campaign_id: str) -> bool:
-        """Delete a campaign from database."""
-        success = self.db.delete_campaign(campaign_id)
-        if success:
+        """Delete a campaign by ID."""
+        if campaign_id in self.campaigns:
+            del self.campaigns[campaign_id]
+            self.save_campaigns()
             return True
-        
-        # Fallback to file
-        return self._delete_campaign_from_file(campaign_id)
-    
-    def _save_campaign_to_file(self, campaign_data: Dict) -> str:
-        """Fallback file storage."""
-        try:
-            campaigns = self._load_campaigns_from_file()
-            campaign_id = campaign_data['id']
-            campaigns[campaign_id] = campaign_data
-            
-            with open(self.campaigns_file, 'w') as f:
-                json.dump(campaigns, f, indent=2, default=str)
-            
-            return campaign_id
-        except Exception as e:
-            st.error(f"Error saving to file: {e}")
-            return ""
-    
-    def _load_campaigns_from_file(self) -> Dict:
-        """Load campaigns from file."""
-        try:
-            if os.path.exists(self.campaigns_file):
-                with open(self.campaigns_file, 'r') as f:
-                    return json.load(f)
-        except Exception as e:
-            st.error(f"Error loading campaigns: {e}")
-        return {}
-    
-    def _get_campaign_from_file(self, campaign_id: str) -> Dict:
-        """Get campaign from file."""
-        campaigns = self._load_campaigns_from_file()
-        return campaigns.get(campaign_id, {})
-    
-    def _list_campaigns_from_file(self) -> List[Dict]:
-        """List campaigns from file."""
-        campaigns = self._load_campaigns_from_file()
-        return list(campaigns.values())
-    
-    def _delete_campaign_from_file(self, campaign_id: str) -> bool:
-        """Delete campaign from file."""
-        try:
-            campaigns = self._load_campaigns_from_file()
-            if campaign_id in campaigns:
-                del campaigns[campaign_id]
-                with open(self.campaigns_file, 'w') as f:
-                    json.dump(campaigns, f, indent=2, default=str)
-                return True
-        except Exception as e:
-            st.error(f"Error deleting from file: {e}")
         return False
 
-def export_campaign_to_csv(campaign_data: Dict) -> str:
-    """Export campaign data to CSV format."""
+def export_campaign_to_csv(campaign_data: Dict, filename: Optional[str] = None) -> str:
+    """Export campaign data to CSV file."""
+    if not filename:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"campaign_export_{timestamp}.csv"
+    
     try:
-        # Flatten the campaign data for CSV export
+        # Flatten campaign data for CSV export
         flattened_data = []
         
         # Basic campaign info
         basic_info = {
-            'Campaign ID': campaign_data.get('id', ''),
-            'Topic': campaign_data.get('topic', ''),
-            'Brand': campaign_data.get('brand', ''),
-            'Created At': campaign_data.get('created_at', '')
+            'campaign_id': campaign_data.get('id', 'Unknown'),
+            'topic': campaign_data.get('topic', 'Unknown'),
+            'brand': campaign_data.get('brand', 'Unknown'),
+            'budget': campaign_data.get('budget', 0),
+            'created_at': campaign_data.get('created_at', 'Unknown')
         }
         
-        # Add agent results
+        # Agent results
         results = campaign_data.get('results', {})
-        for agent_name, agent_data in results.items():
-            if isinstance(agent_data, dict):
-                for key, value in agent_data.items():
-                    if isinstance(value, (str, int, float)):
-                        basic_info[f"{agent_name}_{key}"] = value
+        for agent_name, agent_result in results.items():
+            row = basic_info.copy()
+            row['agent'] = agent_name
+            row['result'] = str(agent_result)
+            flattened_data.append(row)
         
-        flattened_data.append(basic_info)
-        
-        # Convert to DataFrame and then CSV
+        # Create DataFrame and export
         df = pd.DataFrame(flattened_data)
-        csv_filename = f"campaign_{campaign_data.get('id', 'export')}.csv"
-        df.to_csv(csv_filename, index=False)
+        df.to_csv(filename, index=False)
         
-        return csv_filename
+        return filename
         
     except Exception as e:
-        st.error(f"Error exporting to CSV: {e}")
+        print(f"Error exporting to CSV: {e}")
         return ""
 
-def create_sample_user_profile() -> Dict:
+def create_sample_user_profile() -> Dict[str, Any]:
     """Create a sample user profile for testing."""
     return {
         "demographics": {
             "age_range": "25-34",
-            "gender": "Non-binary",
-            "income": "$50,000-$75,000",
-            "location": "Urban area"
+            "income": "$50k-$75k",
+            "education": "Bachelor's degree",
+            "location": "Urban"
         },
         "interests": [
-            "Sustainable living",
             "Technology",
-            "Fitness",
-            "Travel"
+            "Sustainability", 
+            "Health & Wellness",
+            "Professional Development"
         ],
         "behavior": {
-            "online_shopping_frequency": "Weekly",
+            "shopping_preference": "Online research, in-store purchase",
             "social_media_usage": "High",
-            "preferred_content_type": "Video",
-            "device_preference": "Mobile"
+            "brand_loyalty": "Medium",
+            "early_adopter": True
         },
-        "purchase_history": {
-            "last_purchase": "Eco-friendly water bottle",
-            "average_order_value": "$45",
-            "favorite_brands": ["Patagonia", "Apple", "Nike"]
+        "preferences": {
+            "content_format": ["Video", "Infographics", "Articles"],
+            "communication_style": "Professional but approachable",
+            "contact_frequency": "Weekly"
         }
     }
 
 def format_agent_response(response: str, agent_name: str) -> str:
-    """Format agent response for better display."""
-    if not response or "Error:" in response:
-        return f"❌ {agent_name} encountered an error: {response}"
+    """Format agent response for display."""
+    if not response:
+        return f"No response from {agent_name}"
     
-    # Add agent-specific formatting
-    if agent_name == "TrendHarvester":
-        return f"🔍 **Trend Analysis:**\n{response}"
-    elif agent_name == "AnalogicalReasoner":
-        return f"🧠 **Brand Analogy:**\n{response}"
-    elif agent_name == "CreativeSynthesizer":
-        return f"✨ **Creative Content:**\n{response}"
-    elif agent_name == "BudgetOptimizer":
-        return f"💰 **Budget Optimization:**\n{response}"
-    elif agent_name == "PersonalizationAgent":
-        return f"👤 **Personalization Plan:**\n{response}"
+    # Add agent branding
+    formatted = f"**{agent_name} Analysis:**\n\n"
+    formatted += response
     
-    return response
+    return formatted
 
-def create_budget_chart_data(budget_response: str) -> Dict:
-    """Extract budget allocation data for chart display."""
-    # Default allocation
-    default_data = {
-        "Google Ads": 40,
-        "Meta/Facebook": 30,
-        "Programmatic": 20,
-        "Email": 10
+def create_budget_chart_data(optimization_plan: str) -> Dict[str, float]:
+    """Extract budget allocation data from optimization plan."""
+    # Default budget allocation if parsing fails
+    default_allocation = {
+        "Social Media": 35.0,
+        "Search Ads": 25.0,
+        "Content Marketing": 20.0,
+        "Email Marketing": 12.0,
+        "Influencer Marketing": 8.0
     }
     
     try:
-        # Try to extract percentages from the response
-        import re
+        # Try to parse percentages from the optimization plan
+        # This is a simplified parser - in production, use more robust parsing
+        allocation = {}
+        lines = optimization_plan.split('\n')
         
-        # Look for percentage patterns
-        google_match = re.search(r'Google[^:]*:?\s*(\d+)%', budget_response, re.IGNORECASE)
-        meta_match = re.search(r'(?:Meta|Facebook)[^:]*:?\s*(\d+)%', budget_response, re.IGNORECASE)
-        prog_match = re.search(r'Programmatic[^:]*:?\s*(\d+)%', budget_response, re.IGNORECASE)
-        email_match = re.search(r'Email[^:]*:?\s*(\d+)%', budget_response, re.IGNORECASE)
+        for line in lines:
+            if '%' in line:
+                # Extract channel name and percentage
+                parts = line.split(':')
+                if len(parts) >= 2:
+                    channel = parts[0].strip()
+                    percentage_part = parts[1].strip()
+                    
+                    # Extract number before %
+                    for char in percentage_part:
+                        if char.isdigit() or char == '.':
+                            continue
+                        else:
+                            percentage_str = percentage_part[:percentage_part.index(char)]
+                            break
+                    else:
+                        percentage_str = percentage_part.replace('%', '')
+                    
+                    try:
+                        percentage = float(percentage_str)
+                        allocation[channel] = percentage
+                    except ValueError:
+                        continue
         
-        if google_match or meta_match or prog_match or email_match:
-            extracted_data = {}
-            if google_match:
-                extracted_data["Google Ads"] = int(google_match.group(1))
-            if meta_match:
-                extracted_data["Meta/Facebook"] = int(meta_match.group(1))
-            if prog_match:
-                extracted_data["Programmatic"] = int(prog_match.group(1))
-            if email_match:
-                extracted_data["Email"] = int(email_match.group(1))
+        # Return parsed allocation if valid, otherwise default
+        if allocation and sum(allocation.values()) > 0:
+            return allocation
+        else:
+            return default_allocation
             
-            # Fill in missing values with defaults
-            for key in default_data:
-                if key not in extracted_data:
-                    extracted_data[key] = default_data[key]
-            
-            return extracted_data
-    
     except Exception as e:
-        st.warning(f"Could not parse budget data: {e}")
-    
-    return default_data
+        print(f"Error parsing budget allocation: {e}")
+        return default_allocation
 
 def validate_api_keys() -> Dict[str, bool]:
     """Validate that required API keys are available."""
-    return {
-        "GEMINI_API_KEY": bool(os.getenv("GEMINI_API_KEY")),
-        "MISTRAL_API_KEY": bool(os.getenv("MISTRAL_API_KEY")),
-        "HUGGINGFACE_API_TOKEN": bool(os.getenv("HUGGINGFACE_API_TOKEN"))
+    required_keys = {
+        "GEMINI_API_KEY": os.getenv("GEMINI_API_KEY"),
+        "MISTRAL_API_KEY": os.getenv("MISTRAL_API_KEY"),
+        "HUGGINGFACE_API_TOKEN": os.getenv("HUGGINGFACE_API_TOKEN")
     }
+    
+    return {key: bool(value) for key, value in required_keys.items()}
+
+def clean_text_for_analysis(text: str) -> str:
+    """Clean text for AI analysis."""
+    if not text:
+        return ""
+    
+    # Remove extra whitespace
+    cleaned = ' '.join(text.split())
+    
+    # Limit length for API calls
+    max_length = 2000
+    if len(cleaned) > max_length:
+        cleaned = cleaned[:max_length] + "..."
+    
+    return cleaned
+
+def calculate_engagement_score(metrics: Dict) -> float:
+    """Calculate overall engagement score from metrics."""
+    try:
+        likes = metrics.get('likes', 0)
+        shares = metrics.get('shares', 0)
+        comments = metrics.get('comments', 0)
+        views = metrics.get('views', 1)  # Avoid division by zero
+        
+        # Calculate engagement rate
+        total_engagement = likes + shares + comments
+        engagement_rate = (total_engagement / views) * 100
+        
+        # Normalize to 0-10 scale
+        normalized_score = min(engagement_rate / 10, 10.0)
+        
+        return round(normalized_score, 2)
+        
+    except Exception as e:
+        print(f"Error calculating engagement score: {e}")
+        return 5.0  # Default neutral score
+
+def generate_campaign_summary(campaign_data: Dict) -> str:
+    """Generate a text summary of campaign results."""
+    try:
+        topic = campaign_data.get('topic', 'Unknown')
+        brand = campaign_data.get('brand', 'Unknown')
+        budget = campaign_data.get('budget', 0)
+        
+        results = campaign_data.get('results', {})
+        agent_count = len(results)
+        
+        summary = f"""
+Campaign Summary:
+================
+Brand: {brand}
+Topic: {topic}
+Budget: ${budget:,}
+Agents Executed: {agent_count}
+Created: {campaign_data.get('created_at', 'Unknown')}
+
+Results Overview:
+- Trend Analysis: {'✓' if 'trend_harvester' in results else '✗'}
+- Brand Analogies: {'✓' if 'analogical_reasoner' in results else '✗'}
+- Creative Content: {'✓' if 'creative_synthesizer' in results else '✗'}
+- Budget Optimization: {'✓' if 'budget_optimizer' in results else '✗'}
+- Personalization: {'✓' if 'personalization_agent' in results else '✗'}
+        """
+        
+        return summary.strip()
+        
+    except Exception as e:
+        print(f"Error generating summary: {e}")
+        return "Error generating campaign summary"
+
+def format_currency(amount: float) -> str:
+    """Format currency values for display."""
+    if amount >= 1000000:
+        return f"${amount/1000000:.1f}M"
+    elif amount >= 1000:
+        return f"${amount/1000:.1f}K"
+    else:
+        return f"${amount:.0f}"
+
+def calculate_roi_prediction(budget: float, metrics: Dict) -> float:
+    """Calculate ROI prediction based on budget and metrics."""
+    try:
+        # Simple ROI calculation based on industry averages
+        base_roi = 150  # 150% baseline ROI
+        
+        # Adjust based on budget efficiency
+        if budget > 50000:
+            budget_multiplier = 1.2
+        elif budget > 10000:
+            budget_multiplier = 1.1
+        else:
+            budget_multiplier = 1.0
+        
+        # Adjust based on engagement metrics
+        engagement_score = calculate_engagement_score(metrics)
+        engagement_multiplier = 1 + (engagement_score / 50)  # Max 20% boost
+        
+        predicted_roi = base_roi * budget_multiplier * engagement_multiplier
+        
+        return round(predicted_roi, 1)
+        
+    except Exception as e:
+        print(f"Error calculating ROI prediction: {e}")
+        return 150.0  # Default baseline

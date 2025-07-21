@@ -1,3 +1,4 @@
+
 """
 AI agent implementations for the multi-agent advertising brain app.
 Each agent specializes in a specific aspect of campaign creation.
@@ -7,9 +8,13 @@ import os
 import json
 import requests
 from typing import Dict, List, Any
-from google import genai
-from google.genai import types
 import logging
+
+# Try to import Gemini, but handle if not available
+try:
+    from google import genai
+except ImportError:
+    genai = None
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -26,9 +31,8 @@ class AIAgent:
     def setup_clients(self):
         """Setup AI model clients."""
         try:
-            gemini_key = os.getenv("GEMINI_API_KEY")
-            if gemini_key:
-                self.gemini_client = genai.Client(api_key=gemini_key)
+            if genai and os.getenv("GEMINI_API_KEY"):
+                self.gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         except Exception as e:
             logger.error(f"Error setting up Gemini client: {e}")
     
@@ -136,82 +140,74 @@ class TrendHarvester(AIAgent):
     
     def __init__(self):
         super().__init__("TrendHarvester")
-        # Initialize live data fetcher
-        from live_data import LiveDataFetcher
-        self.live_data = LiveDataFetcher()
     
     def harvest_trends(self, query: str) -> Dict[str, Any]:
-        """Harvest trends for a given topic with live data integration."""
-        from prompts import TREND_PROMPT
+        """Harvest trends for a given topic."""
         
-        # Fetch live data first
-        live_trends = self.live_data.get_comprehensive_trends(query)
-        trend_signals = self.live_data.analyze_trend_signals(live_trends)
+        prompt = f"""
+        You are a TrendHarvester AI. Analyze the topic '{query}' and identify trending patterns.
         
-        # Enhance prompt with live data context
-        live_context = f"""
-        LIVE DATA CONTEXT:
-        - Social momentum score: {trend_signals['social_momentum']:.1f}/10
-        - News relevance: {trend_signals['news_relevance']}/10
-        - Tech innovation score: {trend_signals['tech_innovation']:.1f}/10
-        - Market interest: {trend_signals['market_interest']}/10
-        - Overall trend score: {trend_signals['overall_score']:.1f}/10
+        Provide insights on:
+        1. Current market trends
+        2. Emerging opportunities
+        3. Cultural relevance
+        4. Audience engagement patterns
         
-        Recent Reddit discussions: {len(live_trends['sources']['reddit'])} trending posts
-        Latest news coverage: {len(live_trends['sources']['news'])} articles
-        GitHub activity: {len(live_trends['sources']['github'])} trending repos
-        Crypto trends: {len(live_trends['sources']['crypto'])} trending coins
+        Return a detailed analysis of trends for this topic.
         """
         
-        enhanced_prompt = TREND_PROMPT.format(query=query) + live_context
-        
         # Try Gemini first, then Mistral, fallback to HuggingFace
-        response = self.call_gemini_api(enhanced_prompt)
+        response = self.call_gemini_api(prompt)
         if "Error:" in response or "not available" in response:
-            response = self.call_mistral_api(enhanced_prompt)
+            response = self.call_mistral_api(prompt)
         if "Error:" in response or "not available" in response:
-            response = self.call_huggingface_api(enhanced_prompt)
+            response = self.call_huggingface_api(prompt)
         
         return {
             "agent": self.name,
             "query": query,
             "trends": response,
-            "live_data": live_trends,
-            "trend_signals": trend_signals,
             "status": "completed"
         }
 
 class AnalogicalReasoner(AIAgent):
     """Agent responsible for creating brand-trend analogies."""
     
-    def __init__(self, vector_store):
+    def __init__(self, vector_store=None):
         super().__init__("AnalogicalReasoner")
         self.vector_store = vector_store
     
     def create_analogy(self, trend: str, brand: str) -> Dict[str, Any]:
         """Create an analogy between a trend and brand."""
-        from prompts import ANALOGY_PROMPT
         
-        # Check for similar analogies first
-        similar = self.vector_store.find_similar_analogies(trend, brand, limit=2)
+        prompt = f"""
+        You are an AnalogicalReasoner AI. Create a compelling analogy between:
+        Trend: {trend}
+        Brand: {brand}
         
-        prompt = ANALOGY_PROMPT.format(trend=trend, brand=brand)
+        Provide a creative connection that shows how the brand aligns with this trend.
+        Make it memorable and persuasive for advertising purposes.
+        """
         
-        # Try Gemini first, fallback to HuggingFace
+        # Try Gemini first, fallback to other models
         response = self.call_gemini_api(prompt)
+        if "Error:" in response:
+            response = self.call_mistral_api(prompt)
         if "Error:" in response:
             response = self.call_huggingface_api(prompt)
         
-        # Store the new analogy
-        if "Error:" not in response:
-            self.vector_store.add_analogy(trend, brand, response)
+        # Store the analogy if vector store is available
+        if self.vector_store and "Error:" not in response:
+            try:
+                self.vector_store.add_analogy(trend, brand, response)
+            except:
+                pass  # Ignore storage errors
         
         return {
             "agent": self.name,
             "trend": trend,
             "brand": brand,
             "analogy": response,
-            "similar_analogies": similar,
             "status": "completed"
         }
 
@@ -223,12 +219,23 @@ class CreativeSynthesizer(AIAgent):
     
     def synthesize_creative(self, analogy: str) -> Dict[str, Any]:
         """Generate creative content based on analogy."""
-        from prompts import CREATIVE_PROMPT
         
-        prompt = CREATIVE_PROMPT.format(analogy=analogy)
+        prompt = f"""
+        You are a CreativeSynthesizer AI. Based on this analogy:
+        {analogy}
         
-        # Try Gemini first, fallback to HuggingFace
+        Create:
+        1. 3 compelling ad headlines
+        2. 2 short social media posts
+        3. 1 elevator pitch
+        
+        Make them engaging and action-oriented.
+        """
+        
+        # Try Gemini first, fallback to other models
         response = self.call_gemini_api(prompt)
+        if "Error:" in response:
+            response = self.call_mistral_api(prompt)
         if "Error:" in response:
             response = self.call_huggingface_api(prompt)
         
@@ -247,28 +254,27 @@ class BudgetOptimizer(AIAgent):
     
     def optimize_budget(self, metrics: Dict = None) -> Dict[str, Any]:
         """Optimize budget allocation across channels."""
-        from prompts import BUDGET_PROMPT
         
-        # Use sample metrics if none provided
-        if not metrics:
-            metrics = {
-                "google_ctr": 3.2,
-                "meta_ctr": 2.8,
-                "programmatic_ctr": 1.5,
-                "email_open_rate": 22.5,
-                "total_budget": 10000
-            }
+        prompt = """
+        You are a BudgetOptimizer AI. Recommend optimal budget allocation across:
+        - Social Media Advertising (Facebook, Instagram, Twitter)
+        - Search Engine Marketing (Google Ads, Bing Ads)
+        - Content Marketing
+        - Email Marketing
+        - Influencer Partnerships
         
-        prompt = BUDGET_PROMPT
+        Provide percentages and reasoning for each channel.
+        """
         
-        # Try Gemini first, fallback to HuggingFace
+        # Try Gemini first, fallback to other models
         response = self.call_gemini_api(prompt)
+        if "Error:" in response:
+            response = self.call_mistral_api(prompt)
         if "Error:" in response:
             response = self.call_huggingface_api(prompt)
         
         return {
             "agent": self.name,
-            "current_metrics": metrics,
             "optimization_plan": response,
             "status": "completed"
         }
@@ -281,13 +287,25 @@ class PersonalizationAgent(AIAgent):
     
     def create_personalization(self, profile: Dict) -> Dict[str, Any]:
         """Create personalized user journey."""
-        from prompts import PERSONALIZATION_PROMPT
         
         profile_json = json.dumps(profile, indent=2)
-        prompt = PERSONALIZATION_PROMPT.format(profile_json=profile_json)
+        prompt = f"""
+        You are a PersonalizationAgent AI. Based on this user profile:
+        {profile_json}
         
-        # Try Gemini first, fallback to HuggingFace
+        Create a personalized marketing journey including:
+        1. Recommended touchpoints
+        2. Content preferences
+        3. Optimal timing
+        4. Channel priorities
+        
+        Tailor the approach to this specific audience.
+        """
+        
+        # Try Gemini first, fallback to other models
         response = self.call_gemini_api(prompt)
+        if "Error:" in response:
+            response = self.call_mistral_api(prompt)
         if "Error:" in response:
             response = self.call_huggingface_api(prompt)
         

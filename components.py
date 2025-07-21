@@ -325,7 +325,11 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
 
     # Professional React-style component with JavaScript interactivity
     component_id = f"agent-card-{hash(agent_name)}"
-    
+
+    execution_time_display = ""
+    if status == 'completed' and execution_time > 0:
+        execution_time_display = f'<div style="font-size: 12px; color: {config["color"]}; margin-top: 8px; font-weight: 500;">Completed in {execution_time:.1f}s</div>'
+
     html_content = f"""
     <div id="{component_id}" class="agent-card" style="
         background: rgba(255, 255, 255, 0.95);
@@ -349,7 +353,7 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
             height: 100%;
             background: {config['color']};
         "></div>
-        
+
         <!-- Main content -->
         <div style="
             display: flex;
@@ -371,7 +375,7 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
                 font-weight: bold;
                 color: {config['color']};
             ">{config['icon']}</div>
-            
+
             <!-- Agent info -->
             <div style="flex: 1;">
                 <div style="
@@ -386,9 +390,9 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
                     color: #6B7280;
                     line-height: 1.5;
                 ">{description}</div>
-                {f'<div style="font-size: 12px; color: {config["color"]}; margin-top: 8px; font-weight: 500;">Completed in {execution_time:.1f}s</div>' if status == 'completed' else ''}
+                {execution_time_display}
             </div>
-            
+
             <!-- Status badge -->
             <div style="
                 padding: 6px 12px;
@@ -403,53 +407,8 @@ def render_agent_card(agent_name: str, description: str, status: str, execution_
             ">{status}</div>
         </div>
     </div>
-    
-    <script>
-        (function() {{
-            const card = document.getElementById('{component_id}');
-            if (card) {{
-                // Add hover effects
-                card.addEventListener('mouseenter', function() {{
-                    this.style.transform = 'translateY(-2px)';
-                    this.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.15)';
-                }});
-                
-                card.addEventListener('mouseleave', function() {{
-                    this.style.transform = 'translateY(0)';
-                    this.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-                }});
-                
-                // Add click animation
-                card.addEventListener('click', function() {{
-                    this.style.transform = 'scale(0.98)';
-                    setTimeout(() => {{
-                        this.style.transform = 'translateY(-2px)';
-                    }}, 100);
-                }});
-                
-                // Add status-specific animations
-                if ('{status}' === 'running') {{
-                    const icon = card.querySelector('div:nth-child(2) > div:first-child');
-                    if (icon) {{
-                        icon.style.animation = 'pulse 2s infinite';
-                    }}
-                }}
-            }}
-        }})();
-    </script>
-    
-    <style>
-        @keyframes pulse {{
-            0%, 100% {{ opacity: 1; }}
-            50% {{ opacity: 0.5; }}
-        }}
-        
-        .agent-card:hover {{
-            border-color: {config['color']} !important;
-        }}
-    </style>
     """
-    
+
     st.markdown(html_content, unsafe_allow_html=True)
 
 def render_metrics_dashboard(metrics: Dict):
@@ -484,7 +443,8 @@ def render_metric_card(label: str, value: float, icon: str):
         bg_color = "rgba(239, 68, 68, 0.1)"
 
     card_id = f"metric-card-{hash(label)}"
-    
+    percentage_suffix = '%' if value <= 100 else ''
+
     st.markdown(f"""
     <div id="{card_id}" class="metric-card" style="
         background: rgba(255, 255, 255, 0.95);
@@ -513,14 +473,14 @@ def render_metric_card(label: str, value: float, icon: str):
             height: 4px;
             background: linear-gradient(90deg, {color}, {color}80);
         "></div>
-        
+
         <!-- Icon -->
         <div style="
             font-size: 32px;
             margin-bottom: 12px;
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
         ">{icon}</div>
-        
+
         <!-- Value -->
         <div style="
             font-size: 36px;
@@ -529,8 +489,8 @@ def render_metric_card(label: str, value: float, icon: str):
             margin-bottom: 8px;
             line-height: 1;
             letter-spacing: -0.025em;
-        ">{value:.1f}{'%' if value <= 100 else ''}</div>
-        
+        ">{value:.1f}{percentage_suffix}</div>
+
         <!-- Label -->
         <div style="
             font-size: 14px;
@@ -540,7 +500,7 @@ def render_metric_card(label: str, value: float, icon: str):
             letter-spacing: 0.5px;
             line-height: 1.2;
             ">{label}</div>
-        
+
         <!-- Progress indicator -->
         <div style="
             position: absolute;
@@ -552,33 +512,6 @@ def render_metric_card(label: str, value: float, icon: str):
             transition: width 1.5s ease-out;
         "></div>
     </div>
-    
-    <script>
-        (function() {{
-            const card = document.getElementById('{card_id}');
-            if (card) {{
-                // Add hover effects
-                card.addEventListener('mouseenter', function() {{
-                    this.style.transform = 'translateY(-4px) scale(1.02)';
-                    this.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15)';
-                    this.style.borderColor = '{color}';
-                }});
-                
-                card.addEventListener('mouseleave', function() {{
-                    this.style.transform = 'translateY(0) scale(1)';
-                    this.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-                }});
-                
-                // Add click animation
-                card.addEventListener('click', function() {{
-                    this.style.transform = 'translateY(-2px) scale(0.98)';
-                    setTimeout(() => {{
-                        this.style.transform = 'translateY(-4px) scale(1.02)';
-                    }}, 150);
-                }});
-            }}
-        }})();
-    </script>
     """, unsafe_allow_html=True)
 
 def render_campaign_results_panel(results: Dict):

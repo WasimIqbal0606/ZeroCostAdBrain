@@ -1,378 +1,291 @@
 """
-PostgreSQL database integration for Neural AdBrain platform.
-Enterprise-grade data persistence with SQLAlchemy ORM.
+Database management for the Neural AdBrain platform.
+Handles campaign storage and retrieval with PostgreSQL.
 """
 
 import os
 import json
 import logging
-from datetime import datetime
 from typing import Dict, List, Any, Optional
-from sqlalchemy import create_engine, Column, String, Text, DateTime, Integer, Float, Boolean
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from datetime import datetime
 import uuid
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-Base = declarative_base()
-
-class Campaign(Base):
-    """Campaign data model."""
-    __tablename__ = 'campaigns'
-    
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    topic = Column(String, nullable=False)
-    brand = Column(String, nullable=False)
-    budget = Column(Float)
-    market_region = Column(String)
-    trend_depth = Column(String)
-    creativity_level = Column(String)
-    include_live_data = Column(Boolean, default=False)
-    user_profile = Column(JSONB)
-    results = Column(JSONB)
-    execution_metadata = Column(JSONB)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    status = Column(String, default='active')
-
-class WorkflowExecution(Base):
-    """Workflow execution tracking."""
-    __tablename__ = 'workflow_executions'
-    
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    campaign_id = Column(String)
-    workflow_id = Column(String)
-    execution_data = Column(JSONB)
-    status = Column(String)
-    start_time = Column(DateTime)
-    end_time = Column(DateTime)
-    execution_time_seconds = Column(Float)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-class Analogy(Base):
-    """Vector analogies storage."""
-    __tablename__ = 'analogies'
-    
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    trend = Column(String, nullable=False)
-    brand = Column(String, nullable=False)
-    analogy = Column(Text, nullable=False)
-    embedding_vector = Column(JSONB)  # Store as JSON array
-    similarity_score = Column(Float)
-    campaign_id = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-class LiveDataSnapshot(Base):
-    """Live market data snapshots."""
-    __tablename__ = 'live_data_snapshots'
-    
-    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    topic = Column(String, nullable=False)
-    data_source = Column(String, nullable=False)  # reddit, github, news, crypto
-    raw_data = Column(JSONB)
-    trend_signals = Column(JSONB)
-    created_at = Column(DateTime, default=datetime.utcnow)
+# Try to import psycopg2, but handle if not available
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor, Json
+    POSTGRES_AVAILABLE = True
+except ImportError:
+    logger.warning("PostgreSQL not available, using file-based storage")
+    POSTGRES_AVAILABLE = False
 
 class DatabaseManager:
-    """PostgreSQL database manager for Neural AdBrain platform."""
-    
+    """Database manager with PostgreSQL and file-based fallback."""
+
     def __init__(self):
-        self.engine = None
-        self.SessionLocal = None
-        self._initialize_database()
-    
-    def _initialize_database(self):
-        """Initialize database connection and create tables."""
+        self.use_postgres = POSTGRES_AVAILABLE and self._check_postgres_connection()
+        self.file_storage = "campaigns_db.json"
+
+        if self.use_postgres:
+            self._initialize_postgres()
+        else:
+            logger.info("Using file-based storage")
+
+    def _check_postgres_connection(self) -> bool:
+        """Check if PostgreSQL is available and accessible."""
         try:
-            database_url = os.getenv('DATABASE_URL')
+            database_url = os.environ.get('DATABASE_URL')
             if not database_url:
-                logger.error("DATABASE_URL not found in environment variables")
-                return
-            
-            self.engine = create_engine(
-                database_url,
-                pool_size=10,
-                max_overflow=20,
-                pool_pre_ping=True,
-                echo=False  # Set to True for SQL debugging
-            )
-            
-            self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-            
-            # Create all tables
-            Base.metadata.create_all(bind=self.engine)
-            logger.info("Database initialized successfully")
-            
+                return False
+
+            conn = psycopg2.connect(database_url)
+            conn.close()
+            return True
+
         except Exception as e:
-            logger.error(f"Database initialization error: {e}")
-            self.engine = None
-            self.SessionLocal = None
-    
-    def get_session(self) -> Optional[Session]:
-        """Get database session."""
-        if not self.SessionLocal:
-            return None
-        return self.SessionLocal()
-    
-    def save_campaign(self, campaign_data: Dict) -> str:
-        """Save campaign to database."""
-        if not self.SessionLocal:
-            logger.error("Database not available")
-            return ""
-        
-        session = self.get_session()
+            logger.warning(f"PostgreSQL not accessible: {e}")
+            return False
+
+    def _initialize_postgres(self):
+        """Initialize PostgreSQL tables."""
         try:
-            campaign = Campaign(
-                id=campaign_data.get('id', str(uuid.uuid4())),
-                topic=campaign_data.get('topic', ''),
-                brand=campaign_data.get('brand', ''),
-                budget=campaign_data.get('budget', 0),
-                market_region=campaign_data.get('market_region', ''),
-                trend_depth=campaign_data.get('trend_depth', ''),
-                creativity_level=campaign_data.get('creativity_level', ''),
-                include_live_data=campaign_data.get('include_live_data', False),
-                user_profile=campaign_data.get('user_profile', {}),
-                results=campaign_data.get('results', {}),
-                execution_metadata=campaign_data.get('execution_metadata', {})
-            )
-            
-            session.add(campaign)
-            session.commit()
-            
-            logger.info(f"Campaign saved: {campaign.id}")
-            return campaign.id
-            
+            database_url = os.environ.get('DATABASE_URL')
+            conn = psycopg2.connect(database_url)
+            cursor = conn.cursor()
+
+            # Create campaigns table
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS campaigns (
+                    id VARCHAR(255) PRIMARY KEY,
+                    topic VARCHAR(255) NOT NULL,
+                    brand VARCHAR(255) NOT NULL,
+                    budget DECIMAL(10, 2),
+                    market_region VARCHAR(100),
+                    user_profile JSONB,
+                    results JSONB,
+                    execution_metadata JSONB,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            logger.info("PostgreSQL tables initialized")
+
         except Exception as e:
-            session.rollback()
-            logger.error(f"Error saving campaign: {e}")
+            logger.error(f"Error initializing PostgreSQL: {e}")
+            self.use_postgres = False
+
+    def save_campaign(self, campaign_data: Dict) -> str:
+        """Save campaign data."""
+        campaign_id = str(uuid.uuid4())
+        campaign_data['id'] = campaign_id
+        campaign_data['created_at'] = datetime.now().isoformat()
+
+        if self.use_postgres:
+            return self._save_campaign_postgres(campaign_data)
+        else:
+            return self._save_campaign_file(campaign_data)
+
+    def _save_campaign_postgres(self, campaign_data: Dict) -> str:
+        """Save campaign to PostgreSQL."""
+        try:
+            database_url = os.environ.get('DATABASE_URL')
+            conn = psycopg2.connect(database_url)
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                INSERT INTO campaigns (
+                    id, topic, brand, budget, market_region, 
+                    user_profile, results, execution_metadata
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                campaign_data['id'],
+                campaign_data.get('topic', ''),
+                campaign_data.get('brand', ''),
+                campaign_data.get('budget', 0),
+                campaign_data.get('market_region', ''),
+                Json(campaign_data.get('user_profile', {})),
+                Json(campaign_data.get('results', {})),
+                Json(campaign_data.get('execution_metadata', {}))
+            ))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            logger.info(f"Campaign saved to PostgreSQL: {campaign_data['id']}")
+            return campaign_data['id']
+
+        except Exception as e:
+            logger.error(f"Error saving to PostgreSQL: {e}")
+            # Fallback to file storage
+            return self._save_campaign_file(campaign_data)
+
+    def _save_campaign_file(self, campaign_data: Dict) -> str:
+        """Save campaign to file."""
+        try:
+            # Load existing campaigns
+            campaigns = {}
+            if os.path.exists(self.file_storage):
+                with open(self.file_storage, 'r') as f:
+                    campaigns = json.load(f)
+
+            # Add new campaign
+            campaigns[campaign_data['id']] = campaign_data
+
+            # Save back to file
+            with open(self.file_storage, 'w') as f:
+                json.dump(campaigns, f, indent=2, default=str)
+
+            logger.info(f"Campaign saved to file: {campaign_data['id']}")
+            return campaign_data['id']
+
+        except Exception as e:
+            logger.error(f"Error saving to file: {e}")
             return ""
-        finally:
-            session.close()
-    
+
     def get_campaign(self, campaign_id: str) -> Optional[Dict]:
         """Get campaign by ID."""
-        if not self.SessionLocal:
-            return None
-        
-        session = self.get_session()
+        if self.use_postgres:
+            return self._get_campaign_postgres(campaign_id)
+        else:
+            return self._get_campaign_file(campaign_id)
+
+    def _get_campaign_postgres(self, campaign_id: str) -> Optional[Dict]:
+        """Get campaign from PostgreSQL."""
         try:
-            campaign = session.query(Campaign).filter(Campaign.id == campaign_id).first()
-            if campaign:
-                return {
-                    'id': campaign.id,
-                    'topic': campaign.topic,
-                    'brand': campaign.brand,
-                    'budget': campaign.budget,
-                    'market_region': campaign.market_region,
-                    'trend_depth': campaign.trend_depth,
-                    'creativity_level': campaign.creativity_level,
-                    'include_live_data': campaign.include_live_data,
-                    'user_profile': campaign.user_profile,
-                    'results': campaign.results,
-                    'execution_metadata': campaign.execution_metadata,
-                    'created_at': campaign.created_at.isoformat() if campaign.created_at else None,
-                    'updated_at': campaign.updated_at.isoformat() if campaign.updated_at else None,
-                    'status': campaign.status
-                }
-            return None
-            
+            database_url = os.environ.get('DATABASE_URL')
+            conn = psycopg2.connect(database_url)
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+            cursor.execute("SELECT * FROM campaigns WHERE id = %s", (campaign_id,))
+            result = cursor.fetchone()
+
+            cursor.close()
+            conn.close()
+
+            return dict(result) if result else None
+
         except Exception as e:
-            logger.error(f"Error getting campaign: {e}")
+            logger.error(f"Error getting campaign from PostgreSQL: {e}")
+            return self._get_campaign_file(campaign_id)
+
+    def _get_campaign_file(self, campaign_id: str) -> Optional[Dict]:
+        """Get campaign from file."""
+        try:
+            if os.path.exists(self.file_storage):
+                with open(self.file_storage, 'r') as f:
+                    campaigns = json.load(f)
+                return campaigns.get(campaign_id)
             return None
-        finally:
-            session.close()
-    
+
+        except Exception as e:
+            logger.error(f"Error getting campaign from file: {e}")
+            return None
+
     def list_campaigns(self, limit: int = 50) -> List[Dict]:
         """List all campaigns."""
-        if not self.SessionLocal:
-            return []
-        
-        session = self.get_session()
+        if self.use_postgres:
+            return self._list_campaigns_postgres(limit)
+        else:
+            return self._list_campaigns_file(limit)
+
+    def _list_campaigns_postgres(self, limit: int) -> List[Dict]:
+        """List campaigns from PostgreSQL."""
         try:
-            campaigns = session.query(Campaign).order_by(Campaign.created_at.desc()).limit(limit).all()
-            
-            result = []
-            for campaign in campaigns:
-                result.append({
-                    'id': campaign.id,
-                    'topic': campaign.topic,
-                    'brand': campaign.brand,
-                    'budget': campaign.budget,
-                    'market_region': campaign.market_region,
-                    'created_at': campaign.created_at.isoformat() if campaign.created_at else None,
-                    'status': campaign.status
-                })
-            
-            return result
-            
+            database_url = os.environ.get('DATABASE_URL')
+            conn = psycopg2.connect(database_url)
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+            cursor.execute(
+                "SELECT * FROM campaigns ORDER BY created_at DESC LIMIT %s", 
+                (limit,)
+            )
+            results = cursor.fetchall()
+
+            cursor.close()
+            conn.close()
+
+            return [dict(result) for result in results]
+
         except Exception as e:
-            logger.error(f"Error listing campaigns: {e}")
+            logger.error(f"Error listing campaigns from PostgreSQL: {e}")
+            return self._list_campaigns_file(limit)
+
+    def _list_campaigns_file(self, limit: int) -> List[Dict]:
+        """List campaigns from file."""
+        try:
+            if os.path.exists(self.file_storage):
+                with open(self.file_storage, 'r') as f:
+                    campaigns = json.load(f)
+
+                # Sort by created_at and limit
+                campaign_list = list(campaigns.values())
+                campaign_list.sort(
+                    key=lambda x: x.get('created_at', ''), 
+                    reverse=True
+                )
+
+                return campaign_list[:limit]
+
             return []
-        finally:
-            session.close()
-    
+
+        except Exception as e:
+            logger.error(f"Error listing campaigns from file: {e}")
+            return []
+
     def delete_campaign(self, campaign_id: str) -> bool:
         """Delete campaign by ID."""
-        if not self.SessionLocal:
+        if self.use_postgres:
+            return self._delete_campaign_postgres(campaign_id)
+        else:
+            return self._delete_campaign_file(campaign_id)
+
+    def _delete_campaign_postgres(self, campaign_id: str) -> bool:
+        """Delete campaign from PostgreSQL."""
+        try:
+            database_url = os.environ.get('DATABASE_URL')
+            conn = psycopg2.connect(database_url)
+            cursor = conn.cursor()
+
+            cursor.execute("DELETE FROM campaigns WHERE id = %s", (campaign_id,))
+            deleted = cursor.rowcount > 0
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            return deleted
+
+        except Exception as e:
+            logger.error(f"Error deleting campaign from PostgreSQL: {e}")
+            return self._delete_campaign_file(campaign_id)
+
+    def _delete_campaign_file(self, campaign_id: str) -> bool:
+        """Delete campaign from file."""
+        try:
+            if os.path.exists(self.file_storage):
+                with open(self.file_storage, 'r') as f:
+                    campaigns = json.load(f)
+
+                if campaign_id in campaigns:
+                    del campaigns[campaign_id]
+
+                    with open(self.file_storage, 'w') as f:
+                        json.dump(campaigns, f, indent=2, default=str)
+
+                    return True
+
             return False
-        
-        session = self.get_session()
-        try:
-            campaign = session.query(Campaign).filter(Campaign.id == campaign_id).first()
-            if campaign:
-                session.delete(campaign)
-                session.commit()
-                logger.info(f"Campaign deleted: {campaign_id}")
-                return True
+
+        except Exception as e:
+            logger.error(f"Error deleting campaign from file: {e}")
             return False
-            
-        except Exception as e:
-            session.rollback()
-            logger.error(f"Error deleting campaign: {e}")
-            return False
-        finally:
-            session.close()
-    
-    def save_analogy(self, trend: str, brand: str, analogy: str, embedding_vector: List[float] = None, campaign_id: str = None) -> str:
-        """Save analogy to database."""
-        if not self.SessionLocal:
-            return ""
-        
-        session = self.get_session()
-        try:
-            analogy_record = Analogy(
-                trend=trend,
-                brand=brand,
-                analogy=analogy,
-                embedding_vector=embedding_vector or [],
-                campaign_id=campaign_id
-            )
-            
-            session.add(analogy_record)
-            session.commit()
-            
-            logger.info(f"Analogy saved: {analogy_record.id}")
-            return analogy_record.id
-            
-        except Exception as e:
-            session.rollback()
-            logger.error(f"Error saving analogy: {e}")
-            return ""
-        finally:
-            session.close()
-    
-    def find_similar_analogies(self, trend: str, brand: str, limit: int = 3) -> List[Dict]:
-        """Find similar analogies using database search."""
-        if not self.SessionLocal:
-            return []
-        
-        session = self.get_session()
-        try:
-            # Simple text-based similarity for now
-            analogies = session.query(Analogy).filter(
-                Analogy.trend.ilike(f'%{trend}%') | 
-                Analogy.brand.ilike(f'%{brand}%')
-            ).limit(limit).all()
-            
-            result = []
-            for analogy in analogies:
-                result.append({
-                    'id': analogy.id,
-                    'trend': analogy.trend,
-                    'brand': analogy.brand,
-                    'analogy': analogy.analogy,
-                    'similarity': analogy.similarity_score or 0.8,  # Default similarity
-                    'created_at': analogy.created_at.isoformat() if analogy.created_at else None
-                })
-            
-            return result
-            
-        except Exception as e:
-            logger.error(f"Error finding similar analogies: {e}")
-            return []
-        finally:
-            session.close()
-    
-    def save_workflow_execution(self, execution_data: Dict) -> str:
-        """Save workflow execution record."""
-        if not self.SessionLocal:
-            return ""
-        
-        session = self.get_session()
-        try:
-            execution = WorkflowExecution(
-                campaign_id=execution_data.get('campaign_id'),
-                workflow_id=execution_data.get('workflow_id'),
-                execution_data=execution_data.get('execution_data', {}),
-                status=execution_data.get('status', 'completed'),
-                start_time=datetime.fromisoformat(execution_data.get('start_time', datetime.now().isoformat())),
-                end_time=datetime.fromisoformat(execution_data.get('end_time', datetime.now().isoformat())),
-                execution_time_seconds=execution_data.get('execution_time_seconds', 0)
-            )
-            
-            session.add(execution)
-            session.commit()
-            
-            logger.info(f"Workflow execution saved: {execution.id}")
-            return execution.id
-            
-        except Exception as e:
-            session.rollback()
-            logger.error(f"Error saving workflow execution: {e}")
-            return ""
-        finally:
-            session.close()
-    
-    def save_live_data_snapshot(self, topic: str, data_source: str, raw_data: Dict, trend_signals: Dict = None) -> str:
-        """Save live data snapshot."""
-        if not self.SessionLocal:
-            return ""
-        
-        session = self.get_session()
-        try:
-            snapshot = LiveDataSnapshot(
-                topic=topic,
-                data_source=data_source,
-                raw_data=raw_data,
-                trend_signals=trend_signals or {}
-            )
-            
-            session.add(snapshot)
-            session.commit()
-            
-            logger.info(f"Live data snapshot saved: {snapshot.id}")
-            return snapshot.id
-            
-        except Exception as e:
-            session.rollback()
-            logger.error(f"Error saving live data snapshot: {e}")
-            return ""
-        finally:
-            session.close()
-    
-    def get_database_stats(self) -> Dict:
-        """Get database statistics."""
-        if not self.SessionLocal:
-            return {'error': 'Database not available'}
-        
-        session = self.get_session()
-        try:
-            stats = {
-                'total_campaigns': session.query(Campaign).count(),
-                'total_analogies': session.query(Analogy).count(),
-                'total_workflow_executions': session.query(WorkflowExecution).count(),
-                'total_live_data_snapshots': session.query(LiveDataSnapshot).count(),
-                'recent_campaigns': session.query(Campaign).filter(
-                    Campaign.created_at > datetime.now().replace(hour=0, minute=0, second=0)
-                ).count()
-            }
-            
-            return stats
-            
-        except Exception as e:
-            logger.error(f"Error getting database stats: {e}")
-            return {'error': str(e)}
-        finally:
-            session.close()
