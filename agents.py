@@ -10,37 +10,55 @@ import requests
 from typing import Dict, Any
 import logging
 
-# Try to import Gemini, but handle if not available
-try:
-    import google.generativeai as genai
-    GENAI_AVAILABLE = True
-except ImportError:
-    genai = None
-    GENAI_AVAILABLE = False
+# Constants
+class ErrorMessages:
+    PREFIX = "Error:"
+    NOT_AVAILABLE = "not available"
+    GEMINI_ERROR = "Gemini API error"
+    MISTRAL_ERROR = "Mistral API error"
+    CONFIG_ERROR = "Configuration error"
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Try to import Gemini, but handle if not available
+try:
+    import google.generativeai as genai
+    GENAI_AVAILABLE = True
+    if os.getenv("GEMINI_API_KEY"):
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        logger.info("Gemini API configured successfully")
+    else:
+        logger.warning("Gemini API key not found")
+        GENAI_AVAILABLE = False
+except ImportError:
+    genai = None
+    GENAI_AVAILABLE = False
+    logger.warning("Google Generative AI package not available")
 
 class AIAgent:
     """Base class for all AI agents."""
     
     def __init__(self, name: str):
         self.name = name
-        self.gemini_client = None
+        self.gemini_model = None
         self.setup_clients()
     
     def setup_clients(self):
         """Setup AI model clients."""
         try:
-            if GENAI_AVAILABLE and os.getenv("GEMINI_API_KEY"):
-                genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-                self.gemini_configured = True
+            if GENAI_AVAILABLE:
+                if hasattr(genai, 'GenerativeModel'):
+                    self.gemini_model = genai.GenerativeModel('gemini-pro')
+                    logger.info(f"Initialized Gemini model for {self.name}")
+                else:
+                    logger.warning("GenerativeModel not available in google.generativeai")
             else:
-                self.gemini_configured = False
-        except Exception as e:
-            logger.error(f"Error setting up Gemini client: {e}")
-            self.gemini_configured = False
+                logger.info("Gemini AI not available")
+        except (AttributeError, ValueError) as e:
+            logger.error(f"{ErrorMessages.CONFIG_ERROR} in {self.name}: {e}")
+            self.gemini_model = None
     
     def call_mistral_api(self, prompt: str, model: str = "mistral-small-latest") -> str:
         """Call La Plateforme Mistral API."""
@@ -125,19 +143,18 @@ class AIAgent:
             return f"Error: {str(e)}"
     
     def call_gemini_api(self, prompt: str) -> str:
-        """Call Gemini API."""
+        """Call the Gemini API with the given prompt."""
         try:
-            if not self.gemini_configured or not GENAI_AVAILABLE:
-                return "Gemini client not available"
-            
-            model = genai.GenerativeModel('gemini-1.5-flash')
-            response = model.generate_content(prompt)
-            
-            return response.text or "No response from Gemini"
-            
-        except Exception as e:
-            logger.error(f"Error calling Gemini API: {e}")
-            return f"Error: {str(e)}"
+            if not self.gemini_model:
+                return f"Sample {self.name} output: AI analysis would appear here with proper API key"
+
+            response = self.gemini_model.generate_content(prompt)
+            if hasattr(response, 'text'):
+                return response.text
+            return "No response generated"
+        except (AttributeError, ValueError, RuntimeError) as e:
+            logger.error(f"{ErrorMessages.GEMINI_ERROR}: {e}")
+            return f"{ErrorMessages.PREFIX} {str(e)}"
 
 class TrendHarvester(AIAgent):
     """Agent responsible for identifying emerging micro-trends."""
@@ -201,11 +218,11 @@ class AnalogicalReasoner(AIAgent):
             response = self.call_huggingface_api(prompt)
         
         # Store the analogy if vector store is available
-        if self.vector_store and "Error:" not in response:
+        if self.vector_store and ErrorMessages.PREFIX not in response:
             try:
                 self.vector_store.add_analogy(trend, brand, response)
-            except:
-                pass  # Ignore storage errors
+            except (AttributeError, ValueError, RuntimeError) as e:
+                logger.warning(f"Failed to store analogy in vector store: {e}")  # Log but continue
         
         return {
             "agent": self.name,
@@ -256,7 +273,7 @@ class BudgetOptimizer(AIAgent):
     def __init__(self):
         super().__init__("BudgetOptimizer")
     
-    def optimize_budget(self, metrics: Dict = None) -> Dict[str, Any]:
+    def optimize_budget(self) -> Dict[str, Any]:
         """Optimize budget allocation across channels."""
         
         prompt = """

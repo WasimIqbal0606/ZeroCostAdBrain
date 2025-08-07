@@ -1,5 +1,17 @@
 """
-Specialized AI agents for the Neural AdBrain platform.
+Simport os
+import json
+import requests
+import logging
+from typing import Dict, List, Any
+try:
+    import google.generativeai as genai
+    GENAI_AVAILABLE = True
+except ImportError:
+    genai = None
+    GENAI_AVAILABLE = False
+from datetime import datetime
+from live_data import LiveDataFetcherzed AI agents for the Neural AdBrain platform.
 Six focused agents with specific prompts for campaign creation.
 """
 
@@ -7,12 +19,13 @@ import os
 import json
 import requests
 import logging
-from typing import Dict, List, Any
-try:
-    from google import genai
-except ImportError:
-    genai = None
+from typing import Dict, List, Any, Optional
+import google.generativeai as genai
 from datetime import datetime
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class BaseSpecializedAgent:
@@ -25,28 +38,31 @@ class BaseSpecializedAgent:
     def setup_clients(self):
         """Setup AI model clients."""
         try:
-            # Gemini client
-            if genai and os.environ.get("GEMINI_API_KEY"):
-                self.gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+            api_key = os.environ.get("GEMINI_API_KEY")
+            if api_key:
+                genai.configure(api_key=api_key)
+                self.gemini_configured = True
+                logging.info("Gemini API configured successfully")
             else:
-                self.gemini_client = None
+                self.gemini_configured = False
+                logging.warning("Gemini API key not found in environment variables")
         except Exception as e:
-            logging.warning(f"Could not initialize Gemini client: {e}")
-            self.gemini_client = None
+            self.gemini_configured = False
+            logging.error(f"Error configuring Gemini API: {str(e)}")
     
     def call_gemini_api(self, prompt: str) -> str:
         """Call Gemini API."""
-        if not self.gemini_client:
+        if not self.gemini_configured:
             return f"Sample {self.name} output: AI analysis would appear here with proper API key"
         
         try:
-            response = self.gemini_client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
-            )
-            return response.text or "No response generated"
+            model = genai.GenerativeModel('gemini-pro')
+            response = model.generate_content(prompt)
+            if hasattr(response, 'text'):
+                return response.text
+            return "No response generated"
         except Exception as e:
-            logging.error(f"Gemini API error in {self.name}: {e}")
+            logging.error(f"Gemini API error in {self.name}: {str(e)}")
             return f"Error in {self.name}: {str(e)}"
 
 
@@ -87,7 +103,8 @@ class MemeHarvester(BaseSpecializedAgent):
             # Try to parse JSON response
             parsed_result = json.loads(result)
             return parsed_result
-        except:
+        except json.JSONDecodeError as e:
+            logging.warning(f"Failed to parse JSON response in MemeHarvester: {e}")
             # Fallback structured response
             return {
                 "trending_phrases": [
@@ -148,7 +165,8 @@ class NarrativeAligner(BaseSpecializedAgent):
         try:
             parsed_result = json.loads(result)
             return parsed_result
-        except:
+        except json.JSONDecodeError as e:
+            logging.warning(f"Failed to parse JSON response in NarrativeAligner: {e}")
             return {
                 "story_hook": "Transform your future with innovation that understands you",
                 "narrative_framework": {
@@ -220,7 +238,8 @@ class CopyCrafter(BaseSpecializedAgent):
         try:
             parsed_result = json.loads(result)
             return parsed_result
-        except:
+        except json.JSONDecodeError as e:
+            logging.warning(f"Failed to parse JSON response in CopyCrafter: {e}")
             return {
                 "headlines": [
                     {"text": "Discover What's Possible When Innovation Meets You", "target_platform": "social media", "appeal_type": "emotional"},
@@ -304,7 +323,8 @@ class HookOptimizer(BaseSpecializedAgent):
         try:
             parsed_result = json.loads(result)
             return parsed_result
-        except:
+        except json.JSONDecodeError as e:
+            logging.warning(f"Failed to parse JSON response in HookOptimizer: {e}")
             return {
                 "ranked_hooks": [
                     {
@@ -404,7 +424,8 @@ class SequencePlanner(BaseSpecializedAgent):
         try:
             parsed_result = json.loads(result)
             return parsed_result
-        except:
+        except json.JSONDecodeError as e:
+            logging.warning(f"Failed to parse JSON response in SequencePlanner: {e}")
             return {
                 "email_sequence": [
                     {
@@ -536,7 +557,8 @@ class AnalyticsInterpreter(BaseSpecializedAgent):
         try:
             parsed_result = json.loads(result)
             return parsed_result
-        except:
+        except json.JSONDecodeError as e:
+            logging.warning(f"Failed to parse JSON response in AnalyticsInterpreter: {e}")
             return {
                 "performance_summary": {
                     "overall_score": 7.8,
